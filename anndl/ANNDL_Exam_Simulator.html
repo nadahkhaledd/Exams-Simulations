@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNDL Exam Simulator Extended</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #e8e8e8; line-height: 1.6; padding: 16px; min-height: 100vh; }
+  .container { max-width: 820px; margin: 0 auto; }
+  .header { text-align: center; padding: 24px; background: rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+  .header h1 { font-size: 1.5em; color: #4ecca3; margin-bottom: 6px; }
+  .header p { color: #aaa; font-size: 0.9em; }
+  .mode-btns { margin-top: 14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 14px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: #4ecca3; transition: width 0.3s; width: 0%; }
+  .card { background: rgba(255,255,255,0.06); border-radius: 16px; padding: 22px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
+  .qnum { color: #4ecca3; font-size: 0.8em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .qtype { color: #e94560; font-size: 0.72em; float: right; }
+  .question { font-size: 1.08em; margin: 12px 0 16px; color: #fff; }
+  .question code { background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; color: #4ecca3; font-size: 0.88em; }
+  .option { display: block; padding: 12px 15px; margin: 7px 0; background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; transition: all 0.15s; font-size: 0.95em; }
+  .option:hover { background: rgba(78,204,163,0.1); border-color: #4ecca3; }
+  .option.selected { background: rgba(78,204,163,0.15); border-color: #4ecca3; }
+  .option.correct { background: rgba(78,204,163,0.25); border-color: #4ecca3; }
+  .option.wrong { background: rgba(233,69,96,0.25); border-color: #e94560; }
+  .option.missed { background: rgba(255,200,0,0.15); border-color: #ffc800; }
+  .btn { background: #4ecca3; color: #16213e; border: none; padding: 12px 26px; border-radius: 10px; font-size: 0.98em; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 6px; }
+  .btn:hover { background: #45b890; transform: translateY(-1px); }
+  .btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: rgba(255,255,255,0.12); color: #e8e8e8; }
+  .btn-small { padding: 8px 16px; font-size: 0.82em; }
+  .feedback { margin-top: 14px; padding: 15px; border-radius: 10px; font-size: 0.9em; background: rgba(0,0,0,0.3); border-left: 4px solid #4ecca3; display: none; }
+  .feedback.show { display: block; }
+  .feedback.is-wrong { border-left-color: #e94560; }
+  .feedback strong { color: #4ecca3; }
+  .feedback.is-wrong strong { color: #e94560; }
+  .hint { color: #ffc800; font-size: 0.82em; margin-top: 8px; }
+  .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+  .score-screen { text-align: center; padding: 36px 24px; }
+  .score-big { font-size: 2.8em; color: #4ecca3; font-weight: 700; }
+  .score-msg { font-size: 1.15em; margin: 14px 0; }
+  .instruction { font-size: 0.8em; color: #ffc800; margin-bottom: 10px; font-style: italic; }
+  .flashcard-answer { display:none; margin-top:14px; padding:16px; background: rgba(78,204,163,0.1); border-radius:10px; }
+  .flashcard-answer.show { display:block; }
+  .flashcard-answer pre { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 0.84em; line-height: 1.5; }
+  .selfgrade { margin-top:12px; display:flex; gap:8px; }
+</style></head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🎯 ANNDL Exam Simulator Extended</h1>
+    <p>40 questions · extra focus on OPEN questions</p>
+    <div class="mode-btns">
+      <button class="btn btn-small" onclick="startMode('all')">All 40</button>
+      <button class="btn btn-small btn-secondary" onclick="startMode('open')">Open Qs only</button>
+      <button class="btn btn-small btn-secondary" onclick="startMode('mcq')">MCQ only</button>
+      <button class="btn btn-small btn-secondary" onclick="startMode('calc')">Calc + RF only</button>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <p id="counter" style="font-size:0.82em;"></p>
+  </div>
+  <div id="quiz"></div>
+</div>
+
+<script>
+const ALL = [
+  {cat:"open", type:"OPEN (flashcard)", topic:"Information Retrieval", flashcard:true,
+   q:"What is Information Retrieval and how do CNNs perform it? (Give the full method.)",
+   answer:`IR = finding, from a database, the items most similar to a query.
+CNN method:
+1. Take a pretrained CNN, remove the classifier, keep the Feature Extraction Network (FEN).
+2. Compute the LATENT REPRESENTATION (FEN output vector) for every database image.
+3. For a query image, compute its latent representation.
+4. Retrieve the K nearest neighbors in latent space (L1/L2/cosine distance).
+Why: latent-space distances are semantically meaningful (similar objects cluster), unlike raw pixels. Like Google Image Search.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Autoencoder", flashcard:true,
+   q:"Describe an autoencoder: structure, loss, why a bottleneck, and 3 applications.",
+   answer:`Structure: Encoder compresses input → latent bottleneck → Decoder reconstructs input.
+Loss: MSE between input and reconstruction ‖x − g(x)‖².
+Bottleneck: forces the net to learn meaningful structure (else it learns trivial identity).
+Type: UNSUPERVISED.
+Applications: (1) compression/dim-reduction, (2) denoising (noisy→clean), (3) anomaly detection (high reconstruction error = anomaly), (4) feature extraction, (5) generation (VAE).`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Denoising Autoencoder", flashcard:true,
+   q:"How do you TRAIN a denoising autoencoder? What dataset and loss?",
+   answer:`Dataset: pairs of (noisy image, clean image). You can create them by ADDING synthetic noise to clean images.
+Input: noisy image. Target: the clean image.
+Loss: MSE between the network output and the clean target.
+The network learns to map noisy → clean, i.e. to remove noise. It generalizes to unseen noisy images.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"GAN", flashcard:true,
+   q:"What does GAN stand for? Describe the two parts and the training process.",
+   answer:`GAN = Generative Adversarial Network.
+Two parts:
+- Generator G: takes random noise → produces fake data (e.g. fake image).
+- Discriminator D: takes a real or fake sample → outputs probability it's real.
+Training (adversarial): D learns to distinguish real from fake; G learns to fool D. Alternate updates. UNSUPERVISED. Training is unstable (use dropout, careful LR).
+After convergence: discard D, keep only G for generation. Can make high-res faces.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"CAM", flashcard:true,
+   q:"What is a Class Activation Map (CAM)? Requirements, formula, and key property?",
+   answer:`CAM = a heatmap showing WHERE in the image the CNN looks to decide a class.
+Requirements: a GAP (Global Average Pooling) layer + a SINGLE dense layer at the end.
+Formula: M_c(x,y) = Σ_k w_k^c · f_k(x,y)
+  - f_k(x,y) = feature map k activation at (x,y)
+  - w_k^c = dense-layer weight from feature map k to class c
+Key property: class-specific (different weights per class → different heatmaps).
+Grad-CAM: uses GRADIENTS as weights → works on ANY CNN, no architecture change.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"R-CNN family", flashcard:true,
+   q:"Explain the evolution R-CNN → Fast R-CNN → Faster R-CNN: what changed and why faster?",
+   answer:`R-CNN: Selective Search → ~2000 region proposals → run CNN on EACH region → SVM classify + box regress. 3 separate trainings, ~47s/image.
+Fast R-CNN: run CNN ONCE on whole image → ROI Pooling extracts region features from shared maps → joint classifier+regressor (multi-task, no SVM). End-to-end. ~2s/image. Bottleneck now = Selective Search.
+Faster R-CNN: replace Selective Search with a LEARNED Region Proposal Network (RPN) using anchors + objectness scores; RPN shares the backbone. ~0.2s/image.
+Each version removes the previous one's bottleneck.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Overfitting", flashcard:true,
+   q:"What is overfitting and name 4 techniques to reduce it (with one-line why each works)?",
+   answer:`Overfitting = model learns training data too well (incl. noise) → poor generalization to new data.
+1. Early stopping — stop when validation error rises (catches the overfitting point).
+2. Dropout — randomly disable neurons → forces redundant robust features.
+3. Weight decay (L2) — penalize large weights → simpler model.
+4. Data augmentation — synthesize more varied data → harder to memorize.
+(Also: transfer learning, batch norm as mild regularizer.)`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Vanishing gradient", flashcard:true,
+   q:"What is the vanishing gradient problem, what causes it, and 3 fixes?",
+   answer:`Vanishing gradient = gradients shrink toward 0 in deep nets → early layers stop learning.
+Cause: sigmoid/tanh derivatives ≤ 1; multiplying many via chain rule → ~0. Worse in RNNs (BPTT, repeated weights).
+Fixes:
+1. ReLU activation (derivative 0 or 1, doesn't shrink).
+2. Skip/residual connections (gradient flows through shortcut).
+3. Xavier/Glorot initialization (keeps activation variance stable).
+(For RNNs: LSTM's CEC keeps gradient ≈ 1.)`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Transfer learning", flashcard:true,
+   q:"What is transfer learning and what are the steps to apply it?",
+   answer:`Transfer learning = reuse a network pretrained on a large dataset (e.g. ImageNet) for a new task.
+Steps:
+1. Take the pretrained CNN, remove its classification head.
+2. Add a new head for your task.
+3. FREEZE the convolutional backbone (set requires_grad=False).
+4. Train only the new head (small learning rate).
+5. Optionally fine-tune top conv layers with a tiny LR.
+Why it works: early layers learn generic features (edges/textures) that transfer; only top layers are task-specific. Great for limited data.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Semantic segmentation", flashcard:true,
+   q:"What is semantic segmentation, what architecture, and what loss? Why skip connections in U-Net?",
+   answer:`Semantic segmentation = assign a class label to EVERY pixel. Output H×W×num_classes.
+Architecture: encoder-decoder. Encoder (conv+pool) shrinks spatially, learns semantics. Decoder (transpose conv/upsample) recovers resolution.
+Loss: per-pixel cross-entropy.
+U-Net skip connections CONCATENATE encoder features into the decoder at matching resolution → combine deep semantic info with shallow spatial precision (sharp boundaries). (ResNet adds; U-Net concatenates.)`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"BatchNorm", flashcard:true,
+   q:"What does Batch Normalization do, why, and how many parameters does it have?",
+   answer:`BatchNorm normalizes each channel's activations per mini-batch: x' = (x−μ)/σ, then learnable affine y = γx' + β.
+Why: reduces internal covariate shift → stabilizes & speeds up training, allows higher LR, mild regularization.
+Parameters per channel C: 2C trainable (γ, β) + 2C non-trainable (running mean, running var) = 4C total.
+Behaves differently train vs test (test uses running stats). NOT designed for vanishing gradient.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Word2Vec / CBOW", flashcard:true,
+   q:"What is Word2Vec? Describe CBOW and whether it's supervised.",
+   answer:`Word2Vec maps words to dense vectors (embeddings) where similar words are close, and analogies work (king−man+woman≈queen).
+CBOW (Continuous Bag of Words): predict a TARGET word from its surrounding CONTEXT words. Input = context one-hots → shared projection → average → softmax over vocabulary. Trained with cross-entropy.
+Self-supervised / unsupervised: no human labels — the text provides its own supervision. NOT an autoencoder (input ≠ output).`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Multi-task loss", flashcard:true,
+   q:"In localization, the loss is L = α·L_class + (1−α)·L_reg. Why can't α be tuned by cross-validation on the combined loss?",
+   answer:`Because changing α changes the DEFINITION of the loss itself — so loss values at different α are not comparable. A lower combined loss at one α doesn't mean a better model, just a different weighting.
+To tune α: look at the SEPARATE metrics (classification accuracy AND bounding-box IoU), or use values from published papers. Train the two heads jointly for best results.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"FC → 1x1 conv", flashcard:true,
+   q:"Why do standard CNNs need fixed input size, and how do we fix it (the 'pain and relief')?",
+   answer:`Pain: the final Fully Connected (FC) layers require a fixed-length input vector, so the whole CNN needs a fixed input image size. Conv layers themselves accept any size.
+Relief (two options):
+1. Global Average Pooling (GAP): averages each feature map to one value → fixed-size output regardless of input H,W.
+2. Convert FC layers to 1×1 convolutions → fully convolutional network → accepts any input size, produces a heatmap output.`},
+
+  {cat:"open", type:"OPEN (flashcard)", topic:"Anomaly detection", flashcard:true,
+   q:"How can you do anomaly detection with deep learning? Is it supervised?",
+   answer:`Common method: train an AUTOENCODER on NORMAL data only. At inference, compute reconstruction error — NORMAL samples reconstruct well (low error), ANOMALIES reconstruct poorly (high error). Threshold the error.
+Alternative: use latent-space distances; anomalies are outliers.
+It is typically UNSUPERVISED (or semi-supervised): we have lots of normal data but few/no labeled anomalies. ⚠️ Don't group it with classification/regression as 'supervised'.`},
+
+  // ===== PARAMETER CALC =====
+  {cat:"calc", type:"PARAM CALC (flashcard)", topic:"Conv params", flashcard:true,
+   q:"Compute params + output shape: <code>Conv2d(in=32, out=64, k=5, p=2)</code>, input (32, 100, 100).",
+   answer:`Spatial: k=5, p=2, s=1 → SAME → H=100, W=100. C=64. Output: (64, 100, 100).
+Params = (5·5·32 + 1)·64 = (800+1)·64 = 801·64 = 51,264.`},
+
+  {cat:"calc", type:"PARAM CALC (flashcard)", topic:"Conv params", flashcard:true,
+   q:"Compute params + output shape: <code>Conv2d(in=3, out=16, k=3, p=0)</code> (valid), input (3, 64, 64).",
+   answer:`Spatial: k=3, p=0, s=1 → shrinks by (3−1)=2 → H=62, W=62. C=16. Output: (16, 62, 62).
+Params = (3·3·3 + 1)·16 = (27+1)·16 = 28·16 = 448.`},
+
+  {cat:"calc", type:"PARAM CALC (flashcard)", topic:"Dense params", flashcard:true,
+   q:"After Flatten of a (24, 5, 5) tensor, a <code>Linear(?, 120)</code> follows. Input features and params?",
+   answer:`Flatten: 24·5·5 = 600 features.
+Linear(600, 120) params = (600 + 1)·120 = 601·120 = 72,120.`},
+
+  {cat:"calc", type:"PARAM CALC (flashcard)", topic:"BatchNorm params", flashcard:true,
+   q:"A Keras <code>BatchNormalization()</code> follows a layer with 256 channels. Total / trainable / non-trainable params?",
+   answer:`Total = 4·C = 4·256 = 1024.
+Trainable = 2·C = 512 (γ and β).
+Non-trainable = 2·C = 512 (moving mean and moving variance).`},
+
+  {cat:"calc", type:"PARAM CALC (flashcard)", topic:"Skip connection", flashcard:true,
+   q:"forward: <code>x = torch.cat([a, b], dim=1)</code>, a=(96,128,128), b=(32,128,128). Then <code>Conv2d(in=?, out=64, k=3, p=1)</code>. Input channels + params?",
+   answer:`cat adds channels: 96 + 32 = 128 input channels.
+Conv2d(128, 64, k=3, p=1): params = (3·3·128 + 1)·64 = (1152+1)·64 = 1153·64 = 73,792.`},
+
+  {cat:"calc", type:"PARAM CALC (flashcard)", topic:"Add vs Cat", flashcard:true,
+   q:"forward: <code>x = a + b</code> (torch.add), a=(64,50,50), b=(64,50,50). What is the output shape and how many params does this op add?",
+   answer:`Element-wise add requires SAME shape. Output = (64, 50, 50) — channels UNCHANGED.
+Params added by an Add operation = 0.
+(This is ResNet-style. Contrast with cat, which would give 128 channels.)`},
+
+  // ===== RECEPTIVE FIELD =====
+  {cat:"calc", type:"RECEPTIVE FIELD (flashcard)", topic:"RF", flashcard:true,
+   q:"RF at output of: <code>Conv3 → Conv3 → MaxPool2 → Conv3</code>?",
+   answer:`Backward from output, start RF=1:
+Conv3: 1+2=3 → MaxPool2: 3×2=6 → Conv3: 6+2=8 → Conv3: 8+2=10
+ANSWER: 10×10`},
+
+  {cat:"calc", type:"RECEPTIVE FIELD (flashcard)", topic:"RF", flashcard:true,
+   q:"RF after last pool of: <code>Conv7 → MaxPool2 → Conv5 → MaxPool2</code>?",
+   answer:`Backward, start RF=1:
+MaxPool2: 1×2=2 → Conv5: 2+4=6 → MaxPool2: 6×2=12 → Conv7: 12+6=18
+ANSWER: 18×18`},
+
+  {cat:"calc", type:"RECEPTIVE FIELD (flashcard)", topic:"RF", flashcard:true,
+   q:"RF at output of FIVE stacked <code>Conv3×3</code> layers?",
+   answer:`Each Conv3 adds 2. Start 1: 1→3→5→7→9→11
+ANSWER: 11×11. (Equivalent RF to a single 11×11 conv, but far fewer params.)`},
+
+  {cat:"calc", type:"RECEPTIVE FIELD (flashcard)", topic:"RF", flashcard:true,
+   q:"RF at output of: <code>Conv5 → MaxPool2 → Conv3 → MaxPool2 → Conv3</code>?",
+   answer:`Backward, start 1:
+Conv3: 1+2=3 → MaxPool2: 3×2=6 → Conv3: 6+2=8 → MaxPool2: 8×2=16 → Conv5: 16+4=20
+ANSWER: 20×20`},
+
+  // ===== MCQ: TRAINING TECHNIQUES =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Generalization vs Performance",
+   instruction:"Select ALL that are GENERALIZATION techniques (fight overfitting).",
+   q:"Which of these target GENERALIZATION (not training performance)?",
+   multi:true,
+   options:[
+     {t:"Dropout", correct:true},
+     {t:"Data augmentation", correct:true},
+     {t:"Early stopping", correct:true},
+     {t:"Weight decay", correct:true},
+     {t:"Batch normalization", correct:false},
+     {t:"Momentum", correct:false},
+     {t:"Xavier initialization", correct:false},
+   ],
+   fb:"Generalization = limits/regularizes: dropout, augmentation, early stopping, weight decay. Performance = helps gradients/convergence: BatchNorm, momentum, Xavier."},
+
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Overfitting vs Backprop",
+   instruction:"Same table, different name. Select ALL that deal with the BACKPROPAGATION/performance side.",
+   q:"Which deal with BACKPROPAGATION/training issues (NOT overfitting)?",
+   multi:true,
+   options:[
+     {t:"Leaky ReLU", correct:true},
+     {t:"Shortcut connections", correct:true},
+     {t:"Batch normalization", correct:true},
+     {t:"Xavier initialization", correct:true},
+     {t:"Dropout", correct:false},
+     {t:"Early stopping", correct:false},
+   ],
+   fb:"Backprop side: Leaky ReLU (rescues dying neurons), shortcuts (gradient flow), BatchNorm (stability), Xavier (avoids instability). Overfitting side: dropout, early stopping."},
+
+  // ===== MCQ: LEARNING RATE =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Learning rate",
+   instruction:"Select ALL true.",
+   q:"True statements about learning rate:",
+   multi:true,
+   options:[
+     {t:"Too high → may oscillate / diverge around the minimum", correct:true},
+     {t:"Lower LR → more stable but slower convergence", correct:true},
+     {t:"Common schedule: high at start, decreasing over time", correct:true},
+     {t:"Low LR is preferred when fine-tuning a pretrained model", correct:true},
+     {t:"You should increase LR over time for best results", correct:false},
+   ],
+   fb:"Start HIGH, decrease over time. Low LR = stable/slow & good for fine-tuning. Increasing LR over time is wrong."},
+
+  // ===== MCQ: WORD2VEC =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Word2Vec",
+   instruction:"Select ALL true.",
+   q:"True statements about Word2Vec / embeddings:",
+   multi:true,
+   options:[
+     {t:"Trained self-supervised, minimizing cross-entropy", correct:true},
+     {t:"Produces dense vectors", correct:true},
+     {t:"Supports vector arithmetic (analogies)", correct:true},
+     {t:"Is an autoencoder reconstructing its input", correct:false},
+     {t:"Produces sparse one-hot-like vectors", correct:false},
+   ],
+   fb:"Dense, cross-entropy, self-supervised, analogies. NOT an autoencoder, NOT sparse."},
+
+  // ===== MCQ: CONVOLUTION =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Convolution",
+   instruction:"Select ALL true.",
+   q:"True statements about convolution/correlation:",
+   multi:true,
+   options:[
+     {t:"A linear image classifier = correlation against learned templates", correct:true},
+     {t:"Convolution & correlation are translation invariant", correct:true},
+     {t:"Convolution is linear; ReLU is a separate layer", correct:true},
+     {t:"CNNs can only accept images", correct:false},
+     {t:"Convolution by definition includes a ReLU", correct:false},
+   ],
+   fb:"Templates, translation invariance, conv is linear only. CNNs accept any grid data; ReLU is separate."},
+
+  // ===== MCQ: LENET / CONV MATH =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Conv math / LeNet",
+   instruction:"Select ALL true.",
+   q:"True statements about Conv2D / LeNet:",
+   multi:true,
+   options:[
+     {t:"Stacked conv layers with linear activations = one conv layer", correct:true},
+     {t:"Stride > 1 reduces spatial size", correct:true},
+     {t:"Conv (no activation) = sparse matrix with shared/replicated weights", correct:true},
+     {t:"Most LeNet parameters are in the FC (dense) layers", correct:true},
+     {t:"Bias has dimension N×N×C (one per spatial position)", correct:false},
+   ],
+   fb:"Linear convs compose; stride downsamples; conv = sparse shared-weight matrix; most params in FC. Bias = ONE per filter."},
+
+  // ===== MCQ: OBJECT DETECTION =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Object detection",
+   instruction:"Select ALL true.",
+   q:"True statements about object detection:",
+   multi:true,
+   options:[
+     {t:"YOLO is single-shot, no separate proposal stage", correct:true},
+     {t:"RPN outputs objectness scores", correct:true},
+     {t:"R-CNN uses Selective Search (non-trainable) for proposals", correct:true},
+     {t:"Faster R-CNN's RPN shares the backbone (saves computation)", correct:true},
+     {t:"Mask R-CNN runs a full U-Net per detected box", correct:false},
+   ],
+   fb:"YOLO single-shot; RPN objectness; R-CNN Selective Search; RPN shares backbone. Mask R-CNN = small mask branch, not a U-Net per box."},
+
+  // ===== MCQ: LSTM =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"LSTM",
+   instruction:"Select ALL true.",
+   q:"True statements about LSTM:",
+   multi:true,
+   options:[
+     {t:"The CEC keeps gradients ≈ 1, mitigating vanishing gradient", correct:true},
+     {t:"Bidirectional LSTM helps tasks needing look-ahead (spellcheck)", correct:true},
+     {t:"Sorting a multiset before the LSTM makes output order-invariant", correct:true},
+     {t:"An LSTM is permutation invariant by default", correct:false},
+     {t:"LSTM has forget, input, and output gates", correct:true},
+   ],
+   fb:"CEC, bidirectional look-ahead, sort→invariant, 3 gates. NOT permutation invariant by default."},
+
+  // ===== MCQ: UNSUPERVISED =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Supervised vs Unsupervised",
+   instruction:"Select ALL that can be trained UNSUPERVISED.",
+   q:"Which can be trained without labels?",
+   multi:true,
+   options:[
+     {t:"Autoencoder", correct:true},
+     {t:"GAN", correct:true},
+     {t:"Word2Vec", correct:true},
+     {t:"Anomaly detection (autoencoder-based)", correct:true},
+     {t:"YOLO detector", correct:false},
+     {t:"U-Net segmentation", correct:false},
+   ],
+   fb:"Unsupervised: autoencoder, GAN, Word2Vec, anomaly detection. Supervised (need labels): YOLO (boxes), U-Net (masks)."},
+
+  // ===== MCQ: TASK ID =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Task ID",
+   instruction:"Net outputs (1, H, W) same spatial size, trained with cross-entropy + sigmoid. Select ALL valid tasks.",
+   q:"This per-pixel binary network can:",
+   multi:true,
+   options:[
+     {t:"Segment foreground vs background per pixel", correct:true},
+     {t:"Produce a binary mask (e.g., is-this-pixel-water)", correct:true},
+     {t:"Classify the whole image as cat or dog", correct:false},
+     {t:"Output a continuous depth value per pixel", correct:false},
+   ],
+   fb:"1-channel per-pixel + sigmoid + cross-entropy = per-pixel binary segmentation/masking. NOT whole-image classification (needs single output). NOT continuous depth (that needs MSE regression)."},
+
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Task ID",
+   instruction:"Net outputs (10,) with softmax, trained with categorical cross-entropy. Select ALL valid.",
+   q:"This network can:",
+   multi:true,
+   options:[
+     {t:"Classify an image into one of 10 classes", correct:true},
+     {t:"Recognize a handwritten digit 0-9", correct:true},
+     {t:"Segment the image into regions", correct:false},
+     {t:"Predict a continuous price", correct:false},
+   ],
+   fb:"(10,)+softmax+CE = pick ONE of 10 classes for the whole image. NOT segmentation (needs per-pixel output). NOT regression (needs linear+MSE)."},
+
+  // ===== MCQ: CONCEPTS =====
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"CAM / Grad-CAM",
+   instruction:"Select ALL true.",
+   q:"True statements about CAM / Grad-CAM:",
+   multi:true,
+   options:[
+     {t:"CAM requires a GAP + single dense layer", correct:true},
+     {t:"CAM is class-specific (different heatmap per class)", correct:true},
+     {t:"Grad-CAM works on any CNN without architecture change", correct:true},
+     {t:"Grad-CAM uses gradients to weight feature maps", correct:true},
+     {t:"CAM works on any architecture without modification", correct:false},
+   ],
+   fb:"CAM needs GAP+dense, is class-specific. Grad-CAM uses gradients, works on any CNN. CAM (not Grad-CAM) requires the special architecture."},
+
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"GAN",
+   instruction:"Select ALL true.",
+   q:"True statements about GANs:",
+   multi:true,
+   options:[
+     {t:"Originally designed to generate images", correct:true},
+     {t:"Trained with standard backpropagation", correct:true},
+     {t:"After training, the discriminator can be discarded", correct:true},
+     {t:"Can generate high-resolution human faces", correct:true},
+     {t:"Require labeled data to train", correct:false},
+   ],
+   fb:"Image generation, backprop, discard discriminator after, high-res faces. They're UNSUPERVISED — no labels needed."},
+
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Autoencoder",
+   instruction:"Select ALL true.",
+   q:"True statements about autoencoders:",
+   multi:true,
+   options:[
+     {t:"They reconstruct their own input", correct:true},
+     {t:"Trained with reconstruction loss (e.g. MSE)", correct:true},
+     {t:"Convolutional AEs can restore out-of-focus / missing-value images", correct:true},
+     {t:"The bottleneck forces learning meaningful structure", correct:true},
+     {t:"They require class labels", correct:false},
+   ],
+   fb:"Reconstruct input, MSE loss, can denoise/inpaint, bottleneck forces structure. UNSUPERVISED — no labels."},
+
+  {cat:"mcq", type:"MCQ multi (⚠️neg)", topic:"Segmentation",
+   instruction:"Select ALL true.",
+   q:"True statements about U-Net / segmentation:",
+   multi:true,
+   options:[
+     {t:"Output has same spatial size as input, one label per pixel", correct:true},
+     {t:"U-Net uses concatenation skip connections", correct:true},
+     {t:"Trained with per-pixel cross-entropy", correct:true},
+     {t:"U-Net uses additive (ResNet-style) skips", correct:false},
+     {t:"Needs only image-level labels", correct:false},
+   ],
+   fb:"Per-pixel labels, concatenation skips, cross-entropy. U-Net CONCATENATES (not adds). Needs pixel masks (not image labels)."},
+];
+
+let pool = [], current = 0, score = 0, scorable = 0, selected = [], checked = false;
+
+function startMode(mode){
+  if(mode==='all') pool = ALL.slice();
+  else if(mode==='open') pool = ALL.filter(q=>q.cat==='open');
+  else if(mode==='mcq') pool = ALL.filter(q=>q.cat==='mcq');
+  else if(mode==='calc') pool = ALL.filter(q=>q.cat==='calc');
+  // shuffle
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  current=0; score=0; scorable=0; checked=false; render();
+}
+
+function render(){
+  const quiz=document.getElementById('quiz');
+  document.getElementById('progress').style.width=(current/pool.length*100)+'%';
+  document.getElementById('counter').textContent=`Question ${current+1} of ${pool.length}`;
+  if(current>=pool.length){renderScore();return;}
+  const Q=pool[current];
+  let html=`<div class="card"><span class="qnum">${Q.topic}</span><span class="qtype">${Q.type}</span><div style="clear:both"></div>`;
+  if(Q.instruction) html+=`<div class="instruction">${Q.instruction}</div>`;
+  html+=`<div class="question">${Q.q}</div>`;
+  if(Q.flashcard){
+    html+=`<div class="flashcard-answer" id="fca"><pre>${Q.answer}</pre></div>`;
+    html+=`<button class="btn" onclick="revealFlash()">Reveal Answer</button>`;
+    html+=`<div class="selfgrade" id="sg" style="display:none">
+      <button class="btn btn-small" onclick="grade(true)">✓ I got it</button>
+      <button class="btn btn-small btn-secondary" onclick="grade(false)">✗ Need review</button></div>`;
+    html+=`<div class="nav"><button class="btn btn-secondary" onclick="prev()" ${current===0?'disabled':''}>← Back</button><span></span></div>`;
+  } else {
+    Q.options.forEach((o,i)=>{html+=`<label class="option" id="opt${i}" onclick="toggle(${i})">${o.t}</label>`;});
+    html+=`<div class="feedback" id="fb"></div>`;
+    html+=`<div class="nav"><button class="btn btn-secondary" onclick="prev()" ${current===0?'disabled':''}>← Back</button><button class="btn" id="checkbtn" onclick="check()">Check Answer</button></div>`;
+  }
+  html+=`</div>`;
+  quiz.innerHTML=html; selected=[]; checked=false;
+}
+
+function toggle(i){if(checked)return;const el=document.getElementById('opt'+i);if(selected.includes(i)){selected=selected.filter(x=>x!==i);el.classList.remove('selected');}else{selected.push(i);el.classList.add('selected');}}
+
+function check(){
+  if(checked){current++;render();return;}
+  checked=true; const Q=pool[current]; scorable++;
+  let allCorrect=true;
+  Q.options.forEach((o,i)=>{const el=document.getElementById('opt'+i);
+    if(o.correct&&selected.includes(i))el.classList.add('correct');
+    else if(!o.correct&&selected.includes(i)){el.classList.add('wrong');allCorrect=false;}
+    else if(o.correct&&!selected.includes(i)){el.classList.add('missed');allCorrect=false;}});
+  if(allCorrect&&selected.length>0)score++;
+  const fb=document.getElementById('fb');
+  fb.className='feedback show'+(allCorrect?'':' is-wrong');
+  fb.innerHTML=`<strong>${allCorrect?'✓ Correct!':'✗ Review'}</strong><br>${Q.fb}<div class="hint">Green=correct · Red=wrongly picked · Yellow=missed correct</div>`;
+  document.getElementById('checkbtn').textContent='Next →';
+}
+
+function revealFlash(){document.getElementById('fca').classList.add('show');document.getElementById('sg').style.display='flex';}
+function grade(ok){scorable++;if(ok)score++;current++;render();}
+function prev(){if(current>0){current--;render();}}
+
+function renderScore(){
+  document.getElementById('progress').style.width='100%';
+  document.getElementById('counter').textContent='Complete!';
+  const pct=scorable>0?Math.round(score/scorable*100):0;
+  let msg,emoji;
+  if(pct>=75){msg="Excellent. You're ready. Walk in calm.";emoji="🎉";}
+  else if(pct>=55){msg="Good. Review misses and run it again.";emoji="💪";}
+  else{msg="Keep drilling — re-read the answers and retake. That's how it sticks.";emoji="📚";}
+  document.getElementById('quiz').innerHTML=`<div class="card score-screen">
+    <div style="font-size:2.6em">${emoji}</div>
+    <div class="score-big">${score}/${scorable}</div>
+    <div class="score-msg">${msg}</div>
+    <div class="mode-btns">
+      <button class="btn" onclick="startMode('all')">All 40 🔄</button>
+      <button class="btn btn-secondary" onclick="startMode('open')">Open only</button>
+      <button class="btn btn-secondary" onclick="startMode('mcq')">MCQ only</button>
+      <button class="btn btn-secondary" onclick="startMode('calc')">Calc+RF only</button>
+    </div></div>`;
+}
+
+startMode('all');
+</script>
+</body></html>
