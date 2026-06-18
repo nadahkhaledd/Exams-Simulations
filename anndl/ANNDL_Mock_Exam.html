@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artificial Neural Networks and Deep Learning - Mock Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Roboto', -apple-system, sans-serif;
+    background: #f4f5f7;
+    color: #1d2125;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .navbar {
+    background: #fff;
+    border-bottom: 1px solid #d8dce1;
+    padding: 12px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .navbar-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand { font-weight: 700; color: #0f6cbf; font-size: 16px; }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+  .page-header {
+    background: #fff;
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border: 1px solid #d8dce1;
+  }
+  .page-header h1 {
+    color: #0f6cbf;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 6px;
+  }
+  .page-header .sub { color: #6c757d; font-size: 13px; }
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #fff;
+  }
+  .summary-table th, .summary-table td {
+    padding: 8px 12px;
+    border: 1px solid #d8dce1;
+    text-align: left;
+    font-size: 13px;
+  }
+  .summary-table th { background: #f8f9fa; font-weight: 500; width: 28%; }
+  .question-card {
+    background: #fff;
+    border: 1px solid #d8dce1;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .question-info {
+    background: #f8f9fa;
+    padding: 10px 16px;
+    border-bottom: 1px solid #d8dce1;
+    font-size: 12px;
+    color: #495057;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+  .question-info strong { color: #1d2125; }
+  .status-badge {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .status-correct { background: #d4edda; color: #155724; }
+  .status-incorrect { background: #f8d7da; color: #721c24; }
+  .status-partial { background: #fff3cd; color: #856404; }
+  .status-notanswered { background: #e2e3e5; color: #41464b; }
+  .question-content {
+    padding: 20px 24px;
+  }
+  .question-text {
+    margin-bottom: 16px;
+    color: #1d2125;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .question-text strong { font-weight: 500; }
+  .question-text .warn-text {
+    color: #c0392b;
+    font-style: italic;
+    font-size: 12.5px;
+    display: block;
+    margin-top: 8px;
+  }
+  .option-row {
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 3px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    transition: background .12s;
+    border: 1px solid transparent;
+  }
+  .option-row:hover { background: #f8f9fa; }
+  .option-row input { margin-top: 3px; flex-shrink: 0; }
+  .option-row label { cursor: pointer; flex: 1; font-size: 13.5px; }
+  .review-correct {
+    background: #d4edda !important;
+    border-color: #c3e6cb !important;
+  }
+  .review-wrong-pick {
+    background: #f8d7da !important;
+    border-color: #f5c6cb !important;
+  }
+  .review-missed {
+    background: #fff3cd !important;
+    border-color: #ffeeba !important;
+  }
+  .review-indicator {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-left: 8px;
+  }
+  .ind-correct { background: #28a745; color: #fff; }
+  .ind-wrong { background: #dc3545; color: #fff; }
+  .ind-missed { background: #ffc107; color: #1d2125; }
+  table.match-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+  }
+  table.match-grid th, table.match-grid td {
+    border: 1px solid #d8dce1;
+    padding: 8px 12px;
+    font-size: 13px;
+    text-align: left;
+  }
+  table.match-grid th { background: #f8f9fa; font-weight: 500; }
+  table.match-grid select { padding: 5px 8px; font-size: 13px; min-width: 200px; border: 1px solid #ced4da; border-radius: 3px; background: #fff; }
+  table.match-grid td.review-correct { background: #d4edda; }
+  table.match-grid td.review-wrong { background: #f8d7da; }
+  table.match-grid .correct-tag { display: inline-block; color: #155724; font-size: 11px; margin-top: 4px; margin-left: 8px; font-weight: 500; background: #d4edda; padding: 1px 8px; border-radius: 3px; }
+  table.match-grid td.radio-cell { text-align: center; width: 120px; }
+  table.match-grid td.radio-cell input[type="radio"] { transform: scale(1.2); cursor: pointer; }
+  table.match-grid tr.row-correct td:first-child { background: #f0faf3; }
+  table.match-grid tr.row-wrong td:first-child { background: #fef5f5; }
+  table.match-grid td.cell-correct { background: #d4edda; }
+  table.match-grid td.cell-wrong-pick { background: #f8d7da; }
+  .textarea-answer {
+    width: 100%;
+    min-height: 200px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    resize: vertical;
+  }
+  .code-block {
+    background: #f6f8fa;
+    border: 1px solid #d8dce1;
+    border-radius: 3px;
+    padding: 14px 18px;
+    font-family: 'Courier New', monospace;
+    font-size: 12.5px;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+  }
+  .param-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 12.5px;
+  }
+  .param-table th, .param-table td {
+    border: 1px solid #d8dce1;
+    padding: 6px 10px;
+    text-align: left;
+  }
+  .param-table th { background: #f8f9fa; font-weight: 500; font-family: 'Roboto', sans-serif; font-size: 12px; }
+  .param-table input {
+    width: 75px;
+    padding: 4px 6px;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    font-size: 12.5px;
+    font-family: 'Courier New', monospace;
+  }
+  .param-table .correct-cell { background: #d4edda; }
+  .param-table .wrong-cell { background: #f8d7da; }
+  .param-table .expected { display: block; font-size: 11px; color: #155724; margin-top: 2px; }
+  .param-table .expected.wrong { color: #721c24; }
+  .feedback-box {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #e7f3ff;
+    border-left: 4px solid #0f6cbf;
+    border-radius: 0 3px 3px 0;
+    font-size: 13px;
+  }
+  .feedback-box strong { color: #0f6cbf; font-weight: 500; }
+  .submit-area {
+    background: #fff;
+    border: 1px solid #d8dce1;
+    border-radius: 4px;
+    padding: 20px 24px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  .btn {
+    background: #0f6cbf;
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .12s;
+    font-family: 'Roboto', sans-serif;
+  }
+  .btn:hover { background: #0a5599; }
+  .btn-secondary { background: #6c757d; }
+  .btn-secondary:hover { background: #5a6268; }
+  .btn-danger { background: #dc3545; }
+  .btn-danger:hover { background: #c82333; }
+  .summary-results {
+    background: #fff;
+    border: 2px solid #0f6cbf;
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .grade-big {
+    font-size: 36px;
+    color: #0f6cbf;
+    font-weight: 700;
+    margin: 8px 0;
+  }
+  .grade-pct {
+    font-size: 18px;
+    color: #495057;
+    margin-bottom: 12px;
+  }
+  .instructions-box {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 3px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    color: #856404;
+    font-size: 13.5px;
+  }
+  .instructions-box strong { color: #533f03; }
+  hr.divider {
+    border: none;
+    border-top: 1px solid #d8dce1;
+    margin: 16px 0;
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-content">
+    <div style="font-size: 12px; color: #6c757d;">ANNDL Mock Exam</div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Artificial Neural Networks and Deep Learning - Mock Exam</h1>
+    <div class="sub">Practice attempt</div>
+    <table class="summary-table" id="summary-table" style="display:none">
+      <tr><th>Status</th><td>Finished</td></tr>
+      <tr><th>Time allowed</th><td>1 hour 30 mins</td></tr>
+      <tr><th>Grade</th><td><b id="final-grade">-</b> out of 21.00 (<b id="final-pct">-</b>%)</td></tr>
+    </table>
+  </div>
+
+  <div id="intro-screen">
+    <div class="instructions-box">
+      <strong>Instructions.</strong> This is a mock exam mirroring the January 2026 ANNDL exam.
+      You will answer all questions first; you will only see the correct answers and your grade
+      after submission. Several questions use negative marking - wrong selections subtract points
+      from that question's score. Total: 21.00 points across 11 questions. Estimated time: 90 minutes.
+      For Question 5 (open answer) and Question 9 (code, not graded), self-evaluate during the review.
+    </div>
+    <div class="submit-area">
+      <button class="btn" onclick="startExam()">Start Mock Exam</button>
+    </div>
+  </div>
+
+  <div id="exam-screen" style="display:none">
+    <div id="questions-area"></div>
+    <div class="submit-area">
+      <p style="margin: 0 0 14px; color: #495057;">When you are ready, submit your answers to see the review and grade.</p>
+      <div id="submit-initial">
+        <button class="btn btn-danger" onclick="showSubmitConfirm()">Submit all and finish</button>
+      </div>
+      <div id="submit-confirm" style="display:none;">
+        <p style="margin: 0 0 12px; color: #721c24; font-weight: 500;">Are you sure? You won't be able to change your answers after submitting.</p>
+        <button class="btn btn-danger" onclick="submitExam()" style="margin-right:10px;">Yes, submit</button>
+        <button class="btn btn-secondary" onclick="hideSubmitConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="review-screen" style="display:none">
+    <div class="summary-results">
+      <div style="font-size: 14px; color: #495057; margin-bottom: 4px;">Your grade</div>
+      <div class="grade-big"><span id="rev-grade">-</span> / 21.00</div>
+      <div class="grade-pct"><span id="rev-pct">-</span>% - <span id="rev-msg"></span></div>
+    </div>
+    <div id="review-area"></div>
+    <div class="submit-area">
+      <button class="btn btn-secondary" onclick="location.reload()">Retake exam</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// All exam data extracted from the actual January 2026 exam
+const examData = [
+  {
+    n: 1,
+    type: "matching",
+    points: 1.0,
+    text: "We have seen a lot of tricks and tweaks for training neural networks, but, at the end of the day, they all try to either increase generalization or training speed/stability. For each of the following techniques, indicate which of the two goals they primarily address.",
+    items: [
+      { label: "Early stopping", correct: "Generalization" },
+      { label: "Weight decay", correct: "Generalization" },
+      { label: "Dropout", correct: "Generalization" },
+      { label: "ReLU activation functions", correct: "Training speed/stability" },
+      { label: "Shortcut / skip connection", correct: "Training speed/stability" },
+      { label: "Batch Normalization", correct: "Training speed/stability" },
+      { label: "Learning rate", correct: "Training speed/stability" },
+      { label: "Xavier initialization", correct: "Training speed/stability" }
+    ],
+    choices: ["Generalization", "Training speed/stability"]
+  },
+  {
+    n: 2,
+    type: "mcq",
+    points: 2.0,
+    negative: true,
+    text: "The learning rate is a critical hyperparameter of gradient descent because ...",
+    instruction: "Select one or more. Wrong answers will result in negative points.",
+    options: [
+      { letter: "a", text: "It allows, if set low, to finetune pre-trained models keeping their \"knowledge\"", correct: true },
+      { letter: "b", text: "If it is modified during training, starting low and increasing, it might lead to better minima in the loss function at the end of the training.", correct: false },
+      { letter: "c", text: "It can reduce the effectiveness of neural networks based on ReLU activation functions if set too low.", correct: false },
+      { letter: "d", text: "If set low, it guarantees the training is stable and will always converge.", correct: false },
+      { letter: "e", text: "If you set it high the gradient descent moves faster toward the minimum of the loss function.", correct: true },
+      { letter: "f", text: "It must be modified necessarily monotonically during training, so the starting value is critical if not exactly selected as it cannot be reversed.", correct: false },
+      { letter: "g", text: "It might lead to unstable training if set too high. It might oscillate around the minimum or in steep minima valleys.", correct: true }
+    ],
+    feedback: "Correct: a, e, g. Low LR is good for fine-tuning (preserves pretrained knowledge); high LR moves faster but may oscillate. The standard schedule is to start HIGH and decrease over time - the reverse of (b)."
+  },
+  {
+    n: 3,
+    type: "tf-grid",
+    points: 2.0,
+    text: "With reference to the word2vec model to perform word embedding select which of the following is correct (True / False).",
+    items: [
+      { stmt: "Word2vec is not trained in an unsupervised manner.", correct: "False" },
+      { stmt: "Word embedding is considered to be trained in an unsupervised way because it does not minimize a learning loss, but it optimizes vector distances in the embedding space.", correct: "False" },
+      { stmt: "Word embeddings in word2vec represent discrete words and as such they cannot be added nor subtracted.", correct: "False" },
+      { stmt: "Word2Vec is considered to be trained in an unsupervised way because it implements a classical neural autoencoder architecture.", correct: "False" },
+      { stmt: "Word2vec was a major improvement because, unlike one-hot-encoding, it is sparse and, because of this, it represents words with fewer parameters.", correct: "False" }
+    ],
+    choices: ["True", "False"],
+    feedback: "All five statements are False. Word2vec IS trained unsupervised, minimizes cross-entropy (not vector distances), produces DENSE vectors that CAN be added/subtracted (analogies), and is NOT an autoencoder."
+  },
+  {
+    n: 4,
+    type: "tf-grid",
+    points: 2.0,
+    text: "In the following cases, select if the design choice is correct or not according to the description and the assumption. Note: with \"correct\" we mean both the model and the assumptions make sense.",
+    items: [
+      { stmt: "We want to reverse a sentence (last word to first) using a sequential model. We cannot use an LSTM, as in the generation of the new sentence, it has to progress forward in an autoregressive way. We can only resort to a bidirectional LSTM.", correct: "Not correct" },
+      { stmt: "We want a multi-set encoder (unordered list, items can repeat). Items are one-hot encoded. Each multi-set is given to an LSTM (zero init), one item at a time, AFTER SORTING THEM. At the end, the LSTM encodes the multi-set in its state. The same multi-set will always be encoded the same way.", correct: "Correct" },
+      { stmt: "We want a set encoder (unordered, no repeats). Items one-hot. LSTM (zero init), one item at a time. At the end, set is encoded in LSTM state. Because the LSTM is permutation invariant, the same set will always be encoded the same way.", correct: "Not correct" },
+      { stmt: "We could implement a simple spellchecker using a bidirectional LSTM to have a look-ahead effect and avoid the representation bottleneck.", correct: "Correct" },
+      { stmt: "We want a sentiment analysis model. Use a stacked LSTM (each level bidirectional), followed by a sigmoid output.", correct: "Correct" }
+    ],
+    choices: ["Correct", "Not correct"],
+    feedback: "LSTM is NOT permutation invariant by default (so set encoder option is wrong), but it CAN be used for reversing sentences (no rule against that). Sorting first makes the multi-set output deterministic. Bidirectional helps look-ahead (spellcheck) and sentiment."
+  },
+  {
+    n: 5,
+    type: "open",
+    points: 3.5,
+    text: "Consider the LSTM model with its 6 equations. Answer each of the following questions using a single sentence.\n\n0) What does LSTM stand for?\n1-6) What is the meaning/semantics, in terms of LSTM functioning, of each of the 6 equations (numbered 1 to 6 top to bottom)?\n\nUse this template:\n0) ...\n1) ...\n2) ...\n3) ...\n4) ...\n5) ...\n6) ...",
+    expected: `Expected answer:
+0) LSTM stands for Long Short-Term Memory.
+1) Input gate: decides how much new information from the candidate will be added to the cell state (sigmoid, between 0 and 1).
+2) Candidate cell state: computes the new candidate values that could be added to memory (tanh).
+3) Forget gate: decides how much of the previous cell state to keep or forget (sigmoid: 0 = forget all, 1 = keep all).
+4) Cell state update: new memory = (forget gate) * (old cell state) + (input gate) * (candidate) - combines kept old memory with filtered new candidate.
+5) Output gate: decides what part of the cell state to expose as the output/hidden state (sigmoid).
+6) Hidden state: equals the output gate applied to tanh of the cell state - the actual output passed to the next step and outside.
+
+Self-grading: score 0.5 per equation (1-6) + 0.5 for the LSTM acronym.`
+  },
+  {
+    n: 6,
+    type: "mcq",
+    points: 2.0,
+    negative: true,
+    text: "Mark all the answers that are true. Remember our goal is to assess your understanding, not Python programming. Act as a Neural Network expert.",
+    instruction: "Select one or more. Wrong answers will result in negative points.",
+    options: [
+      { letter: "a", text: "A trained linear classifier applied to an image corresponds to computing correlation against a set of learned templates, one per each class. The template returning the largest correlation value against the input image defines the output class, up to bias correction.", correct: true },
+      { letter: "b", text: "In binary classification it is possible to have more than two classes, as long as the last layer of the network has more than two output neurons.", correct: false },
+      { letter: "c", text: "Convolution and Correlation in image processing are translation invariant operations (ignore image boundaries and padding).", correct: true },
+      { letter: "d", text: "Convolution and Correlation in image processing are defined as operations that, given an image, compute a cascade of multiple local and linear transformations, each followed by a ReLU activation.", correct: false },
+      { letter: "e", text: "Expert driven features are very portable to classification tasks in images but not to regression tasks.", correct: false },
+      { letter: "f", text: "Regression, Classification and Anomaly Detection are supervised learning tasks.", correct: false },
+      { letter: "g", text: "Training an ensemble of CNN by changing the weight initialization is a good strategy to reduce classification errors.", correct: true },
+      { letter: "h", text: "Correlation can be seen as a very rudimentary solution for template matching.", correct: true },
+      { letter: "i", text: "The convolutional backbone of a CNN can be seen as a learnable nonlinear filter scanning the entire image.", correct: true },
+      { letter: "j", text: "Deep learning revolution consists in the fact that it became computationally possible to train neural networks with many layers.", correct: false },
+      { letter: "k", text: "A Conv2D layer requires the number of channels in the input to correspond to the spatial size of the filter.", correct: false },
+      { letter: "l", text: "Batch normalization layers standardize the activations of each channel of the input. Thus, it has no parameters as the operation is well defined for each channel.", correct: false }
+    ],
+    feedback: "Correct: a, c, g, h, i. KEY TRAPS: (d) Convolution is linear only - ReLU is a separate layer. (f) Anomaly detection is typically UNSUPERVISED. (j) The DL revolution is about LEARNING features, not just depth. (l) BatchNorm DOES have parameters (gamma, beta)."
+  },
+  {
+    n: 7,
+    type: "mcq",
+    points: 2.0,
+    negative: true,
+    text: "Mark all the answers that are true. Act as a Neural Network expert.",
+    instruction: "Select one or more. Wrong answers will result in negative points.",
+    options: [
+      { letter: "a", text: "A conv2D layer (without nonlinear activation, with padding) with K filters on input NxNxC corresponds to multiplication against a sparse matrix of NxNxC columns. The bias vector is also NxNxC and has constant terms every NxN rows.", correct: false },
+      { letter: "b", text: "Convolutional backbones stacking multiple conv2D layers, all having linear activations, are equivalent to a single conv2D layer with appropriate filter size and number of output channels.", correct: true },
+      { letter: "c", text: "The number of operations in a Conv2D layer is comparable to the number of operations in a dense layer with as many input neurons as the number of parameters in the filters.", correct: false },
+      { letter: "d", text: "Standard CNN preprocessing consists in subtracting the average image computed on the entire dataset, before any train/test or cross-validation split.", correct: false },
+      { letter: "e", text: "Convolutional backbones leveraging skip connections (like ResNet50) are not good candidates for fine tuning since skip connections can prevent weights update.", correct: false },
+      { letter: "f", text: "A conv2D layer without nonlinear activation, taking input NxNxC, corresponds to a linear operation: product of the vectorized input against a very large sparse matrix, where nonzero entries are along multiple diagonal lines. Weights are replicated every NxN rows. The bias vector is constant for many rows.", correct: true },
+      { letter: "g", text: "Inference by the LeNet corresponds to computing correlation against multiple templates learned during training.", correct: false },
+      { letter: "h", text: "The conv2D layers in the LeNet architectures use padding option \"same\" to preserve the spatial extent of the activations.", correct: false },
+      { letter: "i", text: "ReLU is a nonlinear activation function as it performs thresholding. Leaky ReLU instead is a linear function, therefore it should not be used in CNN activations with multiple layers.", correct: false },
+      { letter: "j", text: "Convolutional layers can be configured to reduce the spatial extent of the input volume.", correct: true },
+      { letter: "k", text: "In a trained CNN, each convolutional filter contributes to the computation of the values inside every neuron in the output volume.", correct: false }
+    ],
+    feedback: "Correct: b, f, j. Note: (a) bias is ONE per filter, not NxNxC. (d) Preprocessing stats must be computed ON THE TRAINING FOLD only, not the full dataset (data leakage). (h) LeNet uses VALID padding, not same. (i) Leaky ReLU is piecewise-linear and therefore still NONLINEAR."
+  },
+  {
+    n: 8,
+    type: "mcq",
+    points: 2.0,
+    negative: true,
+    text: "Mark all the answers that are true. Act as a Neural Network expert.",
+    instruction: "Select one or more. Wrong answers will result in negative points.",
+    options: [
+      { letter: "a", text: "YOLO is a single-shot network, which directly estimates multiple bounding boxes and object classes from the input image, without resorting to a separate stage where region proposals are identified.", correct: true },
+      { letter: "b", text: "The Faster R-CNN architecture was trained using a standard end-to-end optimization procedure, similarly to a localization and classification network.", correct: false },
+      { letter: "c", text: "The Mask R-CNN performs instance segmentation by invoking an independent U-Net on each bounding box detected by the Faster R-CNN architecture.", correct: false },
+      { letter: "d", text: "The simplest solution to perform object detection consists in feeding multiple times the same test image to a classification and localization network, and accumulating detected objects.", correct: false },
+      { letter: "e", text: "Anchors are used in the RPN to provide a set of region proposals, which will be further refined by the detection head.", correct: true },
+      { letter: "f", text: "When fine tuning an object detection network, it is necessary to modify the anchors in the RPN to take into account the number of object classes to be detected.", correct: false },
+      { letter: "g", text: "CNNs performing both localization and classification need to address a multi-task learning problem, where MSE and cross-entropy loss are combined in a weighted sum.", correct: true },
+      { letter: "h", text: "The RPN computes a set of probabilities, denoted as objectness scores, that are used to select the most likely locations where objects are.", correct: true },
+      { letter: "i", text: "The Fast R-CNN architecture is a more efficient implementation of the previous R-CNN, where computations are sped up by using separable convolutions, as in MobileNet.", correct: false },
+      { letter: "j", text: "The R-CNN architecture leverages a non-trainable region proposal algorithm to identify potential locations where objects are. Then, regions are cropped, warped and classified.", correct: true }
+    ],
+    feedback: "Correct: a, e, g, h, j. KEY TRAPS: (b) Faster R-CNN uses 4-step alternating training, NOT end-to-end. (c) Mask R-CNN adds a SMALL MASK BRANCH per box, NOT a U-Net per box. (d) NNs are deterministic - multiple inferences give the same result. (f) Anchors are about boxes (sizes/ratios), unrelated to number of classes. (i) Fast R-CNN uses ROI pooling, not separable convs (that's MobileNet)."
+  },
+  {
+    n: 9,
+    type: "code-display",
+    points: 0,
+    text: "Consider the following PyTorch code (NOT graded - provided as context for Question 10):",
+    code: `# Import PyTorch
+import torch
+from torch import nn
+from torch.nn import functional as F
+from torchsummary import summary
+
+BATCH_SIZE = 64
+INPUT_SIZE = (256, 256)  # (Height, Width)
+NUM_CLASSES = 3
+CRITERION = nn.MSELoss()
+
+class Model(nn.Module):
+    def __init__(self, in_channels=3, num_classes=8):
+        super().__init__()
+        self.c0 = nn.Conv2d(in_channels=in_channels, out_channels=32, kernel_size=3, padding=1)
+        self.r0 = nn.ReLU(inplace=True)
+        self.p1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.c1 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
+        self.r1 = nn.ReLU(inplace=True)
+        self.p2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.c2 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
+        self.r2 = nn.ReLU(inplace=True)
+        self.d  = nn.Dropout(0.2)
+        self.u1 = nn.Upsample(scale_factor=2, mode='nearest')
+        self.c3 = nn.Conv2d(in_channels=192, out_channels=64, kernel_size=3, padding=1)
+        self.r3 = nn.ReLU(inplace=True)
+        self.u2 = nn.Upsample(scale_factor=2, mode='nearest')
+        self.c4 = nn.Conv2d(in_channels=96, out_channels=32, kernel_size=3, padding=1)
+        self.r4 = nn.ReLU(inplace=True)
+        self.c5 = nn.Conv2d(in_channels=32, out_channels=16, kernel_size=1)
+        self.r5 = nn.ReLU(inplace=True)
+        self.c6 = nn.Conv2d(in_channels=16, out_channels=8, kernel_size=1)
+        self.r6 = nn.ReLU(inplace=True)
+        self.output = nn.Conv2d(in_channels=8, out_channels=num_classes, kernel_size=1)
+
+    def forward(self, x):
+        c0 = self.c0(x); r0 = self.r0(c0); p1 = self.p1(r0)
+        c1 = self.c1(p1); r1 = self.r1(c1); p2 = self.p2(r1)
+        c2 = self.c2(p2); r2 = self.r2(c2); r2 = self.d(r2)
+        u1 = self.u1(r2); u1 = torch.cat([u1, r1], dim=1)   # skip from r1
+        c3 = self.c3(u1); r3 = self.r3(c3)
+        u2 = self.u2(r3); u2 = torch.cat([u2, r0], dim=1)   # skip from r0
+        c4 = self.c4(u2); r4 = self.r4(c4)
+        c5 = self.c5(r4); r5 = self.r5(c5)
+        c6 = self.c6(r5); r6 = self.r6(c6)
+        return self.output(r6)`
+  },
+  {
+    n: 10,
+    type: "param-fill",
+    points: 2.5,
+    text: "Fill in C, H, W, and the number of parameters for each layer of the network in Question 9. Input shape: 3 x 256 x 256. The model is instantiated with num_classes=3 (the output layer).",
+    note: "Activations are stored as C x H x W. Enter digits only - no commas, dots, or dashes. Use 0 for layers with no parameters.",
+    layers: [
+      { name: "Conv2d-1",     C: 32,  H: 256, W: 256, P: 896 },
+      { name: "ReLU-2",       C: 32,  H: 256, W: 256, P: 0 },
+      { name: "MaxPool2d-3",  C: 32,  H: 128, W: 128, P: 0 },
+      { name: "Conv2d-4",     C: 64,  H: 128, W: 128, P: 18496 },
+      { name: "ReLU-5",       C: 64,  H: 128, W: 128, P: 0 },
+      { name: "MaxPool2d-6",  C: 64,  H: 64,  W: 64,  P: 0 },
+      { name: "Conv2d-7",     C: 128, H: 64,  W: 64,  P: 73856 },
+      { name: "ReLU-8",       C: 128, H: 64,  W: 64,  P: 0 },
+      { name: "Dropout-9",    C: 128, H: 64,  W: 64,  P: 0 },
+      { name: "Upsample-10",  C: 128, H: 128, W: 128, P: 0 },
+      { name: "Conv2d-11",    C: 64,  H: 128, W: 128, P: 110656 },
+      { name: "ReLU-12",      C: 64,  H: 128, W: 128, P: 0 },
+      { name: "Upsample-13",  C: 64,  H: 256, W: 256, P: 0 },
+      { name: "Conv2d-14",    C: 32,  H: 256, W: 256, P: 27680 },
+      { name: "ReLU-15",      C: 32,  H: 256, W: 256, P: 0 },
+      { name: "Conv2d-16",    C: 16,  H: 256, W: 256, P: 528 },
+      { name: "ReLU-17",      C: 16,  H: 256, W: 256, P: 0 },
+      { name: "Conv2d-18",    C: 8,   H: 256, W: 256, P: 136 },
+      { name: "ReLU-19",      C: 8,   H: 256, W: 256, P: 0 },
+      { name: "Conv2d-20",    C: 3,   H: 256, W: 256, P: 27 }
+    ],
+    totals: { total: 232275, trainable: 232275, nontrain: 0 },
+    feedback: "Watch the two torch.cat operations: layer 11 sees in_channels = 128 + 64 = 192 (from r2 + r1 skip); layer 14 sees in_channels = 64 + 32 = 96 (from r3 + r0 skip). Total: 232,275 parameters."
+  },
+  {
+    n: 11,
+    type: "mcq",
+    points: 2.0,
+    negative: true,
+    text: "Looking at the network in Question 9 (output: 3 x 256 x 256, loss: MSE), mark all the tasks the network can be trained for. Stick to tasks a Neural Network expert would actually use this network for - assume training data is always available, but you cannot change the architecture or training options.",
+    instruction: "Select one or more. Wrong answers will result in negative points.",
+    options: [
+      { letter: "a", text: "Given as input a photo of a checkerboard where chess are set, the network modifies the image to highlight which item to move and where by drawing circles.", correct: true },
+      { letter: "b", text: "The network takes as input an X-ray image and in each pixel predicts the probability of having a bone, a body tissue or background.", correct: false },
+      { letter: "c", text: "Given an aerial image, the network predicts in each pixel the total amount of rainfalls, of snow and of UV radiation received over the year.", correct: true },
+      { letter: "d", text: "Takes as input an image and outputs 1 if surely AI-generated, 0 if surely true, a number between 0 and 1 if not confident.", correct: false },
+      { letter: "e", text: "This is a network that suppresses noise in natural images.", correct: true },
+      { letter: "f", text: "Given a picture of a building, the network estimates its height, width and depth.", correct: false },
+      { letter: "g", text: "Takes as input a google map picture of a city, and estimates three pollution parameters in each pixel: dioxide, monoxide and CO2 emissions.", correct: true },
+      { letter: "h", text: "Performs colorization on handwritten text: blue for correct words, red for typos.", correct: false },
+      { letter: "i", text: "Classifies images containing an animal as Horse, Shark, or Bird.", correct: false },
+      { letter: "j", text: "Performs an artistic portrait effect: subject in color, background in different tones of beige.", correct: true },
+      { letter: "k", text: "Segmentation network that segments an input image into person, cat and background classes.", correct: false }
+    ],
+    feedback: "Correct: a, c, e, g, j. The network outputs 3 channels per pixel + MSE loss = per-pixel regression of 3 continuous values OR image-to-image transformation. Wrong: (b,k) segmentation needs CROSS-ENTROPY not MSE. (d) outputs ONE number, not per-pixel. (f) height/width/depth are 3 numbers for the WHOLE image, not per-pixel. (h) classifying typos requires discrete classification per word, not pixel regression. (i) classification needs one label for the whole image."
+  }
+];
+
+let userAnswers = {};
+
+function startExam() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('exam-screen').style.display = 'block';
+  renderQuestions();
+  window.scrollTo(0, 0);
+}
+
+function renderQuestions() {
+  const area = document.getElementById('questions-area');
+  let html = '';
+  examData.forEach(q => {
+    html += renderQuestion(q, false);
+  });
+  area.innerHTML = html;
+}
+
+function renderQuestion(q, isReview) {
+  let html = `<div class="question-card" id="qcard-${q.n}">
+    <div class="question-info">
+      <strong>Question ${q.n}</strong>
+      <span>${isReview ? renderStatus(q) : 'Not yet answered'}</span>
+      <span>Marked out of ${q.points.toFixed(2)}</span>
+    </div>
+    <div class="question-content">
+      <div class="question-text">${q.text.replace(/\n/g, '<br>')}`;
+  if (q.instruction) html += `<span class="warn-text">${q.instruction}</span>`;
+  if (q.note) html += `<span class="warn-text">${q.note}</span>`;
+  html += `</div>`;
+
+  if (q.type === 'matching') {
+    html += renderMatching(q, isReview);
+  } else if (q.type === 'mcq') {
+    html += renderMCQ(q, isReview);
+  } else if (q.type === 'tf-grid') {
+    html += renderTFGrid(q, isReview);
+  } else if (q.type === 'open') {
+    html += renderOpen(q, isReview);
+  } else if (q.type === 'code-display') {
+    html += renderCode(q, isReview);
+  } else if (q.type === 'param-fill') {
+    html += renderParamFill(q, isReview);
+  }
+
+  if (isReview && q.feedback) {
+    html += `<div class="feedback-box"><strong>Feedback:</strong> ${q.feedback}</div>`;
+  }
+  if (isReview && q.expected) {
+    html += `<div class="feedback-box"><strong>Expected answer:</strong><br><pre style="white-space:pre-wrap; font-family:inherit; margin:6px 0 0;">${q.expected}</pre></div>`;
+  }
+
+  html += `</div></div>`;
+  return html;
+}
+
+function renderStatus(q) {
+  const r = q._result;
+  if (!r) return '';
+  if (q.type === 'open' || q.type === 'code-display') {
+    return `<span class="status-badge status-notanswered">${q.type === 'code-display' ? 'Not graded' : 'Self-evaluate'}</span> <span>Mark ${r.score.toFixed(2)} / ${q.points.toFixed(2)}</span>`;
+  }
+  let cls = 'status-correct', label = 'Correct';
+  if (r.score === 0) { cls = 'status-incorrect'; label = 'Incorrect'; }
+  else if (r.score < q.points) { cls = 'status-partial'; label = 'Partially correct'; }
+  return `<span class="status-badge ${cls}">${label}</span> <span>Mark ${r.score.toFixed(2)} / ${q.points.toFixed(2)}</span>`;
+}
+
+function renderMatching(q, isReview) {
+  let html = '<table class="match-grid"><thead><tr><th></th>';
+  q.choices.forEach(c => { html += `<th style="text-align:center; width:160px;">${c}</th>`; });
+  html += '</tr></thead><tbody>';
+  q.items.forEach((it, i) => {
+    const groupName = `q${q.n}_m${i}`;
+    const userVal = userAnswers[groupName] || '';
+    let rowClass = '';
+    let extra = '';
+    if (isReview) {
+      if (userVal === it.correct) rowClass = 'row-correct';
+      else rowClass = 'row-wrong';
+      if (userVal !== it.correct) extra = ` <span class="correct-tag">Correct: ${it.correct}</span>`;
+    }
+    html += `<tr class="${rowClass}"><td>${it.label}${extra}</td>`;
+    q.choices.forEach(c => {
+      const id = `${groupName}_${c.replace(/[^a-zA-Z0-9]/g,'')}`;
+      const checked = userVal === c;
+      let cellCls = 'radio-cell';
+      if (isReview) {
+        if (c === it.correct) cellCls += ' cell-correct';
+        if (checked && c !== it.correct) cellCls += ' cell-wrong-pick';
+      }
+      html += `<td class="${cellCls}"><input type="radio" name="${groupName}" id="${id}" value="${c}" ${checked ? 'checked' : ''} ${isReview ? 'disabled' : ''} onchange="userAnswers['${groupName}']=this.value"></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderMCQ(q, isReview) {
+  let html = '';
+  q.options.forEach((opt, i) => {
+    const id = `q${q.n}_o${i}`;
+    const checked = userAnswers[id] === true;
+    let rowClass = 'option-row';
+    let indicator = '';
+    if (isReview) {
+      if (opt.correct && checked) { rowClass += ' review-correct'; indicator = '<span class="review-indicator ind-correct">Correct</span>'; }
+      else if (!opt.correct && checked) { rowClass += ' review-wrong-pick'; indicator = '<span class="review-indicator ind-wrong">Wrong - you selected</span>'; }
+      else if (opt.correct && !checked) { rowClass += ' review-missed'; indicator = '<span class="review-indicator ind-missed">Correct - you missed</span>'; }
+    }
+    html += `<div class="${rowClass}">
+      <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} ${isReview ? 'disabled' : ''} onchange="userAnswers['${id}']=this.checked">
+      <label for="${id}">${opt.letter}. ${opt.text}${indicator}</label>
+    </div>`;
+  });
+  return html;
+}
+
+function renderTFGrid(q, isReview) {
+  let html = '<table class="match-grid"><thead><tr><th></th>';
+  q.choices.forEach(c => { html += `<th style="text-align:center; width:120px;">${c}</th>`; });
+  html += '</tr></thead><tbody>';
+  q.items.forEach((it, i) => {
+    const groupName = `q${q.n}_tf${i}`;
+    const userVal = userAnswers[groupName] || '';
+    let rowClass = '';
+    let extra = '';
+    if (isReview) {
+      if (userVal === it.correct) rowClass = 'row-correct';
+      else rowClass = 'row-wrong';
+      if (userVal !== it.correct) extra = ` <span class="correct-tag">Correct: ${it.correct}</span>`;
+    }
+    html += `<tr class="${rowClass}"><td>${it.stmt}${extra}</td>`;
+    q.choices.forEach(c => {
+      const id = `${groupName}_${c.replace(/[^a-zA-Z0-9]/g,'')}`;
+      const checked = userVal === c;
+      let cellCls = 'radio-cell';
+      if (isReview) {
+        if (c === it.correct) cellCls += ' cell-correct';
+        if (checked && c !== it.correct) cellCls += ' cell-wrong-pick';
+      }
+      html += `<td class="${cellCls}"><input type="radio" name="${groupName}" id="${id}" value="${c}" ${checked ? 'checked' : ''} ${isReview ? 'disabled' : ''} onchange="userAnswers['${groupName}']=this.value"></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderOpen(q, isReview) {
+  const id = `q${q.n}_open`;
+  const val = userAnswers[id] || '';
+  if (isReview) {
+    return `<div style="background:#f8f9fa; padding:12px; border:1px solid #d8dce1; border-radius:3px; white-space:pre-wrap; font-family:inherit; min-height:80px;">${val || '<em style="color:#999">(not answered)</em>'}</div>`;
+  }
+  return `<textarea class="textarea-answer" id="${id}" oninput="userAnswers['${id}']=this.value">${val}</textarea>`;
+}
+
+function renderCode(q, isReview) {
+  return `<div class="code-block">${q.code}</div>`;
+}
+
+function renderParamFill(q, isReview) {
+  let html = '<table class="param-table"><thead><tr><th style="width:18%">Layer</th><th>C</th><th>H</th><th>W</th><th>Params</th></tr></thead><tbody>';
+  q.layers.forEach((L, i) => {
+    const idC = `q${q.n}_C${i}`, idH = `q${q.n}_H${i}`, idW = `q${q.n}_W${i}`, idP = `q${q.n}_P${i}`;
+    const vC = userAnswers[idC] || '', vH = userAnswers[idH] || '', vW = userAnswers[idW] || '', vP = userAnswers[idP] || '';
+    const cellCls = (val, expect) => {
+      if (!isReview) return '';
+      return val === String(expect) ? 'correct-cell' : 'wrong-cell';
+    };
+    const showExpect = (val, expect) => {
+      if (!isReview) return '';
+      const isC = val === String(expect);
+      return isC ? '' : `<span class="expected wrong">Correct: ${expect}</span>`;
+    };
+    html += `<tr><td>${L.name}</td>`;
+    if (isReview) {
+      html += `<td class="${cellCls(vC, L.C)}">${vC || '-'}${showExpect(vC, L.C)}</td>`;
+      html += `<td class="${cellCls(vH, L.H)}">${vH || '-'}${showExpect(vH, L.H)}</td>`;
+      html += `<td class="${cellCls(vW, L.W)}">${vW || '-'}${showExpect(vW, L.W)}</td>`;
+      html += `<td class="${cellCls(vP, L.P)}">${vP || '-'}${showExpect(vP, L.P)}</td>`;
+    } else {
+      html += `<td><input type="text" id="${idC}" value="${vC}" oninput="userAnswers['${idC}']=this.value"></td>`;
+      html += `<td><input type="text" id="${idH}" value="${vH}" oninput="userAnswers['${idH}']=this.value"></td>`;
+      html += `<td><input type="text" id="${idW}" value="${vW}" oninput="userAnswers['${idW}']=this.value"></td>`;
+      html += `<td><input type="text" id="${idP}" value="${vP}" oninput="userAnswers['${idP}']=this.value"></td>`;
+    }
+    html += '</tr>';
+  });
+  // Totals row
+  const idT = `q${q.n}_total`, idTr = `q${q.n}_trainable`, idNt = `q${q.n}_nontrain`;
+  const vT = userAnswers[idT] || '', vTr = userAnswers[idTr] || '', vNt = userAnswers[idNt] || '';
+  html += `<tr style="background:#f8f9fa"><td colspan="4" style="text-align:right"><b>Total params:</b></td><td>`;
+  if (isReview) {
+    const cls = vT === String(q.totals.total) ? 'correct-cell' : 'wrong-cell';
+    html += `<div class="${cls}" style="padding:4px;">${vT || '-'} ${vT === String(q.totals.total) ? '' : '<span class="expected wrong">Correct: ' + q.totals.total + '</span>'}</div>`;
+  } else {
+    html += `<input type="text" id="${idT}" value="${vT}" oninput="userAnswers['${idT}']=this.value">`;
+  }
+  html += `</td></tr>`;
+  html += `<tr style="background:#f8f9fa"><td colspan="4" style="text-align:right"><b>Trainable params:</b></td><td>`;
+  if (isReview) {
+    const cls = vTr === String(q.totals.trainable) ? 'correct-cell' : 'wrong-cell';
+    html += `<div class="${cls}" style="padding:4px;">${vTr || '-'} ${vTr === String(q.totals.trainable) ? '' : '<span class="expected wrong">Correct: ' + q.totals.trainable + '</span>'}</div>`;
+  } else {
+    html += `<input type="text" id="${idTr}" value="${vTr}" oninput="userAnswers['${idTr}']=this.value">`;
+  }
+  html += `</td></tr>`;
+  html += `<tr style="background:#f8f9fa"><td colspan="4" style="text-align:right"><b>Non-trainable params:</b></td><td>`;
+  if (isReview) {
+    const cls = vNt === String(q.totals.nontrain) ? 'correct-cell' : 'wrong-cell';
+    html += `<div class="${cls}" style="padding:4px;">${vNt || '-'} ${vNt === String(q.totals.nontrain) ? '' : '<span class="expected wrong">Correct: ' + q.totals.nontrain + '</span>'}</div>`;
+  } else {
+    html += `<input type="text" id="${idNt}" value="${vNt}" oninput="userAnswers['${idNt}']=this.value">`;
+  }
+  html += `</td></tr>`;
+  html += '</tbody></table>';
+  return html;
+}
+
+function showSubmitConfirm() {
+  document.getElementById('submit-initial').style.display = 'none';
+  document.getElementById('submit-confirm').style.display = 'block';
+}
+function hideSubmitConfirm() {
+  document.getElementById('submit-confirm').style.display = 'none';
+  document.getElementById('submit-initial').style.display = 'block';
+}
+
+function submitExam() {
+  let totalScore = 0;
+  let totalPossible = 0;
+
+  examData.forEach(q => {
+    const r = computeScore(q);
+    q._result = r;
+    if (q.type !== 'code-display' && q.type !== 'open') {
+      totalScore += r.score;
+      totalPossible += q.points;
+    }
+  });
+
+  // Display results
+  document.getElementById('exam-screen').style.display = 'none';
+  document.getElementById('review-screen').style.display = 'block';
+  document.getElementById('summary-table').style.display = 'table';
+
+  const grade = totalScore;
+  const pct = totalPossible > 0 ? (grade / 21 * 100) : 0;
+  document.getElementById('rev-grade').textContent = grade.toFixed(2);
+  document.getElementById('rev-pct').textContent = pct.toFixed(2);
+  document.getElementById('final-grade').textContent = grade.toFixed(2);
+  document.getElementById('final-pct').textContent = pct.toFixed(2);
+
+  let msg;
+  if (pct >= 60) msg = 'Strong result. Walk in confident tomorrow.';
+  else if (pct >= 45) msg = 'Passing zone. Review the misses below.';
+  else msg = 'Keep practicing - review the explanations and retake.';
+  document.getElementById('rev-msg').textContent = msg;
+
+  // Render all questions in review mode
+  const area = document.getElementById('review-area');
+  let html = '';
+  examData.forEach(q => {
+    html += renderQuestion(q, true);
+  });
+  area.innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function computeScore(q) {
+  if (q.type === 'code-display') return { score: 0 };
+  if (q.type === 'open') return { score: 0 };
+
+  if (q.type === 'matching') {
+    let correct = 0;
+    q.items.forEach((it, i) => {
+      if (userAnswers[`q${q.n}_m${i}`] === it.correct) correct++;
+    });
+    return { score: (correct / q.items.length) * q.points, correct, total: q.items.length };
+  }
+
+  if (q.type === 'tf-grid') {
+    let correct = 0;
+    q.items.forEach((it, i) => {
+      if (userAnswers[`q${q.n}_tf${i}`] === it.correct) correct++;
+    });
+    return { score: (correct / q.items.length) * q.points, correct, total: q.items.length };
+  }
+
+  if (q.type === 'mcq') {
+    // Moodle-style: each correct selection = +1/Ncorrect; each wrong selection = -1/Nwrong (if negative)
+    // Final score = max(0, (correct_selected/N_correct - wrong_selected/N_wrong)) * points
+    const Ncorrect = q.options.filter(o => o.correct).length;
+    const Nwrong = q.options.filter(o => !o.correct).length;
+    let cs = 0, ws = 0;
+    q.options.forEach((opt, i) => {
+      const picked = userAnswers[`q${q.n}_o${i}`] === true;
+      if (picked && opt.correct) cs++;
+      if (picked && !opt.correct) ws++;
+    });
+    let raw = cs / Ncorrect;
+    if (q.negative && Nwrong > 0) raw -= ws / Nwrong;
+    raw = Math.max(0, raw);
+    return { score: raw * q.points, cs, ws, Ncorrect, Nwrong };
+  }
+
+  if (q.type === 'param-fill') {
+    let correct = 0, total = 0;
+    q.layers.forEach((L, i) => {
+      total += 4;
+      if (userAnswers[`q${q.n}_C${i}`] === String(L.C)) correct++;
+      if (userAnswers[`q${q.n}_H${i}`] === String(L.H)) correct++;
+      if (userAnswers[`q${q.n}_W${i}`] === String(L.W)) correct++;
+      if (userAnswers[`q${q.n}_P${i}`] === String(L.P)) correct++;
+    });
+    total += 3;
+    if (userAnswers[`q${q.n}_total`] === String(q.totals.total)) correct++;
+    if (userAnswers[`q${q.n}_trainable`] === String(q.totals.trainable)) correct++;
+    if (userAnswers[`q${q.n}_nontrain`] === String(q.totals.nontrain)) correct++;
+    return { score: (correct / total) * q.points, correct, total };
+  }
+
+  return { score: 0 };
+}
+</script>
+</body>
+</html>
