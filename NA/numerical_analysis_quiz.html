@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Numerical Analysis &mdash; Part 1 Practice Quiz</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    background: #f3f5f8;
+    color: #1f1f24;
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 18px 60px;
+  }
+  header {
+    background: #1a3a6e;
+    color: white;
+    padding: 18px 24px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+  }
+  header h1 { margin: 0 0 4px 0; font-size: 22px; font-weight: 600; }
+  header p  { margin: 0; opacity: 0.85; font-size: 13.5px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .stat {
+    background: white;
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e3e6ec;
+  }
+  .stat .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.4px; }
+  .stat .value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+  .progress-bar {
+    height: 6px;
+    background: #e3e6ec;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #1a3a6e;
+    transition: width 0.3s ease;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 22px 24px;
+    border: 1px solid #e3e6ec;
+    margin-bottom: 16px;
+  }
+
+  .topic-tag {
+    display: inline-block;
+    background: #eef1f7;
+    color: #1a3a6e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 12px;
+  }
+  .q-number { color: #888; font-size: 13px; margin-bottom: 4px; }
+  .q-text {
+    font-size: 15px;
+    margin-bottom: 16px;
+    line-height: 1.55;
+  }
+  .q-text code { background: #f0f2f6; padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    border: 1.5px solid #e3e6ec;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    width: 100%;
+  }
+  .option:hover:not([disabled]) {
+    border-color: #1a3a6e;
+    background: #f7f9fc;
+  }
+  .option[disabled] { cursor: default; }
+  .option.correct { border-color: #2a9450; background: #e8f5ec; }
+  .option.wrong  { border-color: #cf3636; background: #fbeaea; }
+  .option.disabled-correct { border-color: #2a9450; background: #f4faf6; }
+
+  .option-letter {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background: #eef1f7;
+    text-align: center;
+    line-height: 22px;
+    font-weight: 600;
+    font-size: 12px;
+    margin-right: 10px;
+    color: #1a3a6e;
+  }
+  .option.correct .option-letter, .option.disabled-correct .option-letter {
+    background: #2a9450; color: white;
+  }
+  .option.wrong .option-letter { background: #cf3636; color: white; }
+
+  .explanation {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: #f7f9fc;
+    border-left: 3px solid #1a3a6e;
+    border-radius: 4px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .explanation strong { color: #1a3a6e; }
+
+  .nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .btn {
+    flex: 1;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary { background: #1a3a6e; color: white; }
+  .btn-primary:hover { background: #15315c; }
+  .btn-secondary { background: white; color: #1a3a6e; border: 1.5px solid #1a3a6e; }
+  .btn-secondary:hover { background: #f7f9fc; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .result-screen { text-align: center; padding: 40px 20px; }
+  .result-score { font-size: 60px; font-weight: 700; color: #1a3a6e; margin: 8px 0; }
+  .result-subtitle { color: #555; font-size: 14px; margin-bottom: 24px; }
+  .result-grade { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+  .result-grade.good { color: #2a9450; }
+  .result-grade.ok   { color: #c47d00; }
+  .result-grade.poor { color: #cf3636; }
+
+  .review-list { text-align: left; margin-top: 28px; }
+  .review-item {
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+  .review-item.correct { background: #e8f5ec; }
+  .review-item.wrong   { background: #fbeaea; }
+  .review-item .topic { font-size: 11px; color: #666; text-transform: uppercase; }
+
+  .footer {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin-top: 28px;
+  }
+
+  sub, sup { font-size: 10px; }
+
+  @media (max-width: 600px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    header h1 { font-size: 19px; }
+    .card { padding: 18px 18px; }
+    .q-text { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Numerical Analysis &mdash; Practice Quiz</h1>
+</header>
+
+<!-- ========== STATS BAR ========== -->
+<div class="stats">
+  <div class="stat"><div class="label">Question</div><div class="value" id="stat-current">1 / 25</div></div>
+  <div class="stat"><div class="label">Score</div><div class="value" id="stat-score">0</div></div>
+  <div class="stat"><div class="label">Correct</div><div class="value" id="stat-correct">0</div></div>
+  <div class="stat"><div class="label">Answered</div><div class="value" id="stat-answered">0</div></div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width: 0%"></div></div>
+
+<!-- ========== MAIN CONTAINER (quiz or results goes here) ========== -->
+<div id="container"></div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   QUESTION BANK
+   ------------------------------------------------------------
+   Each question = { topic, q, options: [...], answer (0-based), explanation }
+   To add a new question, append a new object to the QUESTIONS array below.
+   ============================================================ */
+
+const QUESTIONS = [
+  // ---------- Nonlinear equations ----------
+  {
+    topic: "Newton iteration",
+    q: "Consider Newton's method applied to f(x) = x<sup>2</sup> &minus; 2 starting from x<sub>0</sub> = 1. What is x<sub>1</sub>?",
+    options: ["1/2", "3/2", "2", "5/4"],
+    answer: 1,
+    explanation: "Newton: x<sub>1</sub> = x<sub>0</sub> &minus; f(x<sub>0</sub>)/f'(x<sub>0</sub>). f(1) = &minus;1, f'(x) = 2x, f'(1) = 2. x<sub>1</sub> = 1 &minus; (&minus;1)/2 = <strong>3/2</strong>."
+  },
+  {
+    topic: "Newton iteration",
+    q: "Apply Newton to f(x) = x<sup>3</sup> &minus; sin(x) starting from x<sub>0</sub> = &pi;/2. Compute x<sub>1</sub>.",
+    options: ["&pi;/2 &minus; (&pi;<sup>3</sup>/8 &minus; 1) / (3&pi;<sup>2</sup>/4)", "&pi;/2 &minus; 1", "0", "&pi;/4"],
+    answer: 0,
+    explanation: "f'(x) = 3x<sup>2</sup> &minus; cos(x). At x = &pi;/2: f = (&pi;/2)<sup>3</sup> &minus; 1 = &pi;<sup>3</sup>/8 &minus; 1. f' = 3(&pi;/2)<sup>2</sup> &minus; 0 = 3&pi;<sup>2</sup>/4. So x<sub>1</sub> = &pi;/2 &minus; (&pi;<sup>3</sup>/8 &minus; 1)/(3&pi;<sup>2</sup>/4)."
+  },
+  {
+    topic: "Newton theory",
+    q: "Which statement about Newton's method for a 1D simple root is FALSE?",
+    options: [
+      "It is a local method.",
+      "It converges quadratically (order 2).",
+      "It is a first-order method.",
+      "It requires f'(x<sub>i</sub>) &ne; 0 at each iterate."
+    ],
+    answer: 2,
+    explanation: "Newton uses a <em>first-order Taylor expansion</em> but achieves <strong>quadratic (order 2)</strong> convergence. Calling it 'first-order' is the classic trap."
+  },
+  {
+    topic: "Rootfinding methods",
+    q: "A method x<sub>i+1</sub> = x<sub>i</sub> &minus; f(x<sub>i</sub>)&middot;(x<sub>i</sub>&minus;x<sub>i&minus;1</sub>)/(f(x<sub>i</sub>)&minus;f(x<sub>i&minus;1</sub>)) uses two starting points and no derivative. This is:",
+    options: ["Newton-Raphson", "Bisection", "Secant", "Chord"],
+    answer: 2,
+    explanation: "<strong>Secant method</strong>: replaces f'(x<sub>i</sub>) in Newton with the slope through the last two iterates. Order &asymp; 1.618 (golden ratio)."
+  },
+  {
+    topic: "Fixed-point",
+    q: "The fixed-point iteration x<sub>i+1</sub> = g(x<sub>i</sub>) converges locally to a fixed point &xi; if g is continuously differentiable near &xi; and:",
+    options: ["|g'(&xi;)| &lt; 1", "g'(&xi;) = 0", "|g(&xi;)| &lt; 1", "g'(&xi;) &gt; 0"],
+    answer: 0,
+    explanation: "Ostrowski's theorem: if g &isin; C<sup>1</sup>, g(&xi;) = &xi;, and <strong>|g'(&xi;)| &lt; 1</strong>, then for x<sub>0</sub> close enough to &xi;, the iteration converges. Asymptotic rate = g'(&xi;)."
+  },
+
+  // ---------- Newton for systems ----------
+  {
+    topic: "Newton systems",
+    q: "Which statement about Newton's method for nonlinear SYSTEMS is FALSE?",
+    options: [
+      "It is a local method.",
+      "It requires solving a linear system at each iteration.",
+      "It is a first-order method.",
+      "It requires a stopping criterion."
+    ],
+    answer: 2,
+    explanation: "Order is <strong>2 (quadratic)</strong>, NOT first-order. All other statements are TRUE."
+  },
+
+  // ---------- Direct linear solvers ----------
+  {
+    topic: "GEM pivoting",
+    q: "Which statement about partial pivoting by rows in the Gaussian Elimination Method (GEM) is FALSE?",
+    options: [
+      "It is applied by default in most real implementations of GEM as it limits propagation of truncation errors.",
+      "Pivoting highly increases the computational time for GEM so it should be applied only when strictly needed.",
+      "It can also be applied when the matrix contains a singular diagonal submatrix.",
+      "Pivoting improves the accuracy of GEM."
+    ],
+    answer: 1,
+    explanation: "The cost increase from pivoting is <strong>negligible</strong> (only row swaps and comparisons). It's applied by default precisely because the trade-off is essentially free."
+  },
+  {
+    topic: "Cholesky",
+    q: "Which statement about the Cholesky factorization method is TRUE?",
+    options: [
+      "It is a special case of LU that works only if A is SPD.",
+      "Compared to LU, its computational cost is much higher but it has better stability.",
+      "It is a direct method that can be applied to any non-singular matrix.",
+      "It is an iterative method for SPD matrices."
+    ],
+    answer: 0,
+    explanation: "Cholesky decomposes A = R<sup>T</sup>R (or LL<sup>T</sup>) and exists <strong>iff A is SPD</strong>. Cost is <strong>(1/3)n<sup>3</sup></strong>, i.e., <em>half</em> of LU. It's a <em>direct</em> method (not iterative)."
+  },
+
+  // ---------- Iterative methods ----------
+  {
+    topic: "Gauss-Seidel",
+    q: "Which statement about the Gauss-Seidel (GS) algorithm for solving linear systems is TRUE?",
+    options: [
+      "If A is symmetric, GS always converges.",
+      "If A is tridiagonal AND Jacobi converges, then GS converges (twice as fast).",
+      "If A is tridiagonal, GS always converges.",
+      "GS always converges in less than n iterations for an n&times;n system in exact arithmetic."
+    ],
+    answer: 1,
+    explanation: "For tridiagonal matrices: &rho;(B<sub>GS</sub>) = &rho;(B<sub>J</sub>)<sup>2</sup>, so if Jacobi converges, GS converges <strong>twice as fast</strong>. Symmetric alone is NOT enough (need pos. def.). Tridiagonal alone is also not enough."
+  },
+  {
+    topic: "Preconditioning",
+    q: "Which statement about preconditioning for iterative methods is TRUE?",
+    options: [
+      "If suitably chosen, P can reduce the number of iterations.",
+      "Whenever it reduces the number of iterations, it also reduces overall computational cost.",
+      "If correctly applied, it can reduce the cost of each iteration.",
+      "It is a method that speeds up the LU factorization step."
+    ],
+    answer: 0,
+    explanation: "Preconditioning reduces <strong>iteration count</strong> when P is well-chosen, but each iteration may cost more (you have to solve a system with P). It is unrelated to LU."
+  },
+  {
+    topic: "Conjugate gradient",
+    q: "Which statement about Conjugate Gradient (CG) is FALSE?",
+    options: [
+      "CG requires A to be SPD.",
+      "In exact arithmetic, CG converges in at most n iterations.",
+      "CG always converges in between n and 2n iterations.",
+      "Search directions are A-conjugate: (Ad<sup>(k)</sup>)<sup>T</sup>d<sup>(j)</sup> = 0 for j &lt; k."
+    ],
+    answer: 2,
+    explanation: "CG converges in <strong>at most n</strong> iterations in exact arithmetic &mdash; not 'between n and 2n'."
+  },
+  {
+    topic: "Condition number",
+    q: "Let A be a square non-singular matrix and K(A) its condition number in 2-norm. Which statement about the numerical solution x<sub>h</sub> of Ax = b is TRUE?",
+    options: [
+      "If K(A) &gt;&gt; 1, even if &Vert;Ax<sub>h</sub> &minus; b&Vert; is small, the error &Vert;x &minus; x<sub>h</sub>&Vert; may be large.",
+      "&Vert;x &minus; x<sub>h</sub>&Vert; &le; K(A).",
+      "Only if K(A) &lt;&lt; 1 and the residual is zero, the solution is accurate.",
+      "If and only if K(A) &lt; 1, the matrix A is non-singular."
+    ],
+    answer: 0,
+    explanation: "When A is ill-conditioned, a small residual does NOT imply a small error. Note K(A) &ge; 1 always, so K(A) &lt; 1 is impossible."
+  },
+
+  // ---------- Interpolation ----------
+  {
+    topic: "Lagrangian",
+    q: "Consider the Lagrangian polynomial &Pi;<sub>3</sub>(x) interpolating (&minus;3,&minus;11), (&minus;1,&minus;7), (1,7), (3,11). Which is TRUE?",
+    options: ["&Pi;(0) = 0", "&Pi;(2) = 21", "&Pi;(1) = 3/8", "&Pi;(3) = 3"],
+    answer: 0,
+    explanation: "The data is <strong>antisymmetric</strong>: y(&minus;x) = &minus;y(x). The unique interpolant is odd &rArr; <strong>&Pi;(0) = 0</strong>. (&Pi;(3) = 11, not 3.)"
+  },
+  {
+    topic: "Interpolation theory",
+    q: "Which statement about Lagrangian interpolation through n+1 distinct nodes is FALSE?",
+    options: [
+      "The polynomial degree is at most n.",
+      "The interpolation polynomial is unique.",
+      "The polynomial always has degree exactly n.",
+      "It satisfies &Pi;(x<sub>i</sub>) = y<sub>i</sub> for every node."
+    ],
+    answer: 2,
+    explanation: "Degree is <strong>at most n</strong>, not exactly n: if data lies on a lower-degree polynomial (e.g. collinear), the interpolant has lower degree."
+  },
+  {
+    topic: "Runge phenomenon",
+    q: "Which statement about Lagrangian interpolation at n+1 <em>equally-spaced</em> nodes is FALSE?",
+    options: [
+      "The error in supremum norm can grow without bound as n increases, even for infinitely differentiable functions.",
+      "For low n it works reasonably well.",
+      "The error always tends to zero as n &rarr; &infin; if f &isin; C<sup>&infin;</sup>.",
+      "This issue is known as Runge's phenomenon."
+    ],
+    answer: 2,
+    explanation: "Runge's phenomenon: with equally-spaced nodes, oscillations near the endpoints can make the error <strong>grow</strong> as n increases &mdash; even for smooth f. Chebyshev nodes fix this."
+  },
+  {
+    topic: "Chebyshev nodes",
+    q: "Which statement about Lagrangian interpolation at n+1 Chebyshev nodes is TRUE?",
+    options: [
+      "It eliminates the excessive oscillations near the ends that occur with equally-spaced nodes.",
+      "It can be applied with any arbitrary choice of interpolation nodes.",
+      "The error at midpoints between two neighbouring nodes is always zero.",
+      "It converges only for polynomials."
+    ],
+    answer: 0,
+    explanation: "Chebyshev nodes cluster near the endpoints &rArr; <strong>no Runge phenomenon</strong>. For analytic f, convergence is exponential."
+  },
+
+  // ---------- Least squares ----------
+  {
+    topic: "Regression",
+    q: "Find the least-squares regression line through (0, 1) and (1, 4).",
+    options: ["y = 1 + 3x", "y = 3 + x", "y = x", "y = 1 + x"],
+    answer: 0,
+    explanation: "Through just 2 points, the regression line passes exactly through both (regression = interpolation for m = n). Slope = (4&minus;1)/(1&minus;0) = 3; intercept = 1. <strong>y = 1 + 3x</strong>."
+  },
+
+  // ---------- Quadrature ----------
+  {
+    topic: "Composite trapezoidal",
+    q: "Approximate I = &int;<sub>&minus;1</sub><sup>1</sup> (x<sup>3</sup> + 1) dx by the composite trapezoidal rule with M = 2 subintervals.",
+    options: ["1", "2", "3", "4"],
+    answer: 1,
+    explanation: "H = 1. Nodes: &minus;1, 0, 1. f values: 0, 1, 2. I<sub>TR</sub> = (1/2)&middot;[0 + 2(1) + 2] = <strong>2</strong>. (Exact value = 2 by symmetry of x<sup>3</sup>.)"
+  },
+  {
+    topic: "Midpoint rule",
+    q: "Approximate I = &int;<sub>&minus;1</sub><sup>1</sup> &radic;(x+1) dx by the simple midpoint rule.",
+    options: ["1.4142", "3.4142", "2.0", "1.2071"],
+    answer: 2,
+    explanation: "Midpoint of [&minus;1, 1] is 0; f(0) = &radic;1 = 1; (b&minus;a) = 2. I<sub>MP</sub> = 2&middot;1 = <strong>2.0</strong>."
+  },
+  {
+    topic: "Quadrature theory",
+    q: "Which statement(s) about numerical quadrature rules is/are TRUE?",
+    options: [
+      "Composite Simpson is exact for cubic polynomials.",
+      "Composite midpoint is exact for linear polynomials.",
+      "Simpson's rule has degree of exactness 3.",
+      "All of the above."
+    ],
+    answer: 3,
+    explanation: "All three are TRUE. Midpoint and trapezoidal have degree of exactness 1; Simpson has degree of exactness 3."
+  },
+
+  // ---------- ODEs ----------
+  {
+    topic: "Heun's method",
+    q: "Which statement about Heun's method is TRUE?",
+    options: [
+      "It is a method that converges with order 2 with respect to the step size h.",
+      "It is an implicit method.",
+      "It is an explicit multistep method.",
+      "When applied to the model problem it is unconditionally absolutely stable."
+    ],
+    answer: 0,
+    explanation: "Heun is explicit, one-step (with 2 function evals per step), order 2, conditionally A-stable. So only the order-2 statement is true."
+  },
+  {
+    topic: "ODE methods",
+    q: "Which statement about Backward Euler (BE) is FALSE?",
+    options: [
+      "It is implicit.",
+      "It converges with order 2 with respect to h.",
+      "It is unconditionally A-stable on the model problem.",
+      "It requires solving an equation for u<sub>n+1</sub> at each step."
+    ],
+    answer: 1,
+    explanation: "BE converges with <strong>order 1</strong>, not order 2. The other statements are all true."
+  },
+  {
+    topic: "Crank-Nicolson",
+    q: "Which statement about Crank-Nicolson (CN) is TRUE?",
+    options: [
+      "If applied to the model problem, it is unconditionally absolutely stable.",
+      "It is explicit.",
+      "It is order 1.",
+      "It uses only f(t<sub>n</sub>, u<sub>n</sub>)."
+    ],
+    answer: 0,
+    explanation: "CN is implicit, order 2, <strong>unconditionally A-stable</strong>. It uses the average of f(t<sub>n</sub>, u<sub>n</sub>) and f(t<sub>n+1</sub>, u<sub>n+1</sub>)."
+  },
+  {
+    topic: "Forward Euler",
+    q: "Forward Euler with h = 0.1 applied to y'(t) = &minus;(1+t)(y&minus;2)<sup>2</sup>, y(0) = &minus;2. Compute u<sub>1</sub>.",
+    options: ["1.5", "2.4", "&minus;3.6", "&minus;2"],
+    answer: 2,
+    explanation: "f(0, &minus;2) = &minus;1&middot;(&minus;4)<sup>2</sup> = &minus;16. u<sub>1</sub> = &minus;2 + 0.1&middot;(&minus;16) = <strong>&minus;3.6</strong>."
+  },
+];
+
+/* ============================================================
+   QUIZ ENGINE
+   ============================================================ */
+
+let state = {
+  current: 0,
+  answers: new Array(QUESTIONS.length).fill(null),
+  score: 0,
+  finished: false,
+};
+
+const container   = document.getElementById("container");
+const statCurrent = document.getElementById("stat-current");
+const statScore   = document.getElementById("stat-score");
+const statCorrect = document.getElementById("stat-correct");
+const statAnswered= document.getElementById("stat-answered");
+const progressFill= document.getElementById("progress-fill");
+
+function updateStats() {
+  statCurrent.textContent  = `${state.current + 1} / ${QUESTIONS.length}`;
+  const answered = state.answers.filter(a => a !== null).length;
+  const correct  = state.answers.filter((a, i) => a === QUESTIONS[i].answer).length;
+  // Score using exam scoring: out of 10, scaled
+  const scaled = answered === 0 ? 0 : (correct * 10 / QUESTIONS.length).toFixed(1);
+  statScore.textContent    = scaled;
+  statCorrect.textContent  = correct;
+  statAnswered.textContent = answered;
+  progressFill.style.width = `${(answered / QUESTIONS.length) * 100}%`;
+}
+
+function renderQuestion() {
+  const i = state.current;
+  const q = QUESTIONS[i];
+  const userAnswer = state.answers[i];
+  const answered = userAnswer !== null;
+
+  const letters = ["A", "B", "C", "D", "E", "F"];
+  const optionsHTML = q.options.map((opt, idx) => {
+    let cls = "option";
+    if (answered) {
+      if (idx === q.answer) {
+        cls += userAnswer === idx ? " correct" : " disabled-correct";
+      } else if (idx === userAnswer) {
+        cls += " wrong";
+      }
+    }
+    return `
+      <button class="${cls}" data-idx="${idx}" ${answered ? "disabled" : ""}>
+        <span class="option-letter">${letters[idx]}</span>${opt}
+      </button>`;
+  }).join("");
+
+  const explanationHTML = answered ? `
+    <div class="explanation">
+      <strong>${userAnswer === q.answer ? "Correct &mdash; " : "Incorrect. "}</strong>${q.explanation}
+    </div>` : "";
+
+  const isLast = i === QUESTIONS.length - 1;
+  const navHTML = `
+    <div class="nav">
+      <button class="btn btn-secondary" id="btn-prev" ${i === 0 ? "disabled" : ""}>&larr; Previous</button>
+      ${isLast
+        ? `<button class="btn btn-primary" id="btn-finish">Finish quiz</button>`
+        : `<button class="btn btn-primary" id="btn-next" ${answered ? "" : "disabled"}>Next &rarr;</button>`}
+    </div>`;
+
+  container.innerHTML = `
+    <div class="card">
+      <span class="topic-tag">${q.topic}</span>
+      <div class="q-number">Question ${i + 1} of ${QUESTIONS.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optionsHTML}</div>
+      ${explanationHTML}
+    </div>
+    ${navHTML}
+  `;
+
+  // Wire up option clicks
+  container.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (state.answers[i] !== null) return; // already answered
+      state.answers[i] = parseInt(btn.dataset.idx, 10);
+      renderQuestion();
+      updateStats();
+    });
+  });
+
+  // Nav buttons
+  const prev = document.getElementById("btn-prev");
+  const next = document.getElementById("btn-next");
+  const fin  = document.getElementById("btn-finish");
+  if (prev) prev.addEventListener("click", () => { state.current--; renderQuestion(); updateStats(); });
+  if (next) next.addEventListener("click", () => { state.current++; renderQuestion(); updateStats(); });
+  if (fin)  fin.addEventListener("click", showResults);
+}
+
+function showResults() {
+  const correct = state.answers.filter((a, i) => a === QUESTIONS[i].answer).length;
+  const total = QUESTIONS.length;
+  const score10 = (correct * 10 / total).toFixed(1);
+  const pct = (correct * 100 / total).toFixed(0);
+
+  let grade, gradeClass;
+  if (correct / total >= 0.85) { grade = "Excellent &mdash; you're exam-ready."; gradeClass = "good"; }
+  else if (correct / total >= 0.65) { grade = "Good &mdash; focus on the topics you missed."; gradeClass = "ok"; }
+  else { grade = "Keep drilling &mdash; re-read the master guide."; gradeClass = "poor"; }
+
+  const review = QUESTIONS.map((q, i) => {
+    const got = state.answers[i];
+    const isCorrect = got === q.answer;
+    const status = got === null ? "Unanswered" : (isCorrect ? "Correct" : "Wrong");
+    return `
+      <div class="review-item ${isCorrect ? "correct" : "wrong"}">
+        <div class="topic">${q.topic} &middot; Q${i + 1} &middot; ${status}</div>
+        <div>${q.q}</div>
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="card result-screen">
+      <div style="font-size: 13px; color: #666; letter-spacing: 0.4px; text-transform: uppercase;">Your score</div>
+      <div class="result-score">${score10} / 10</div>
+      <div class="result-subtitle">${correct} of ${total} correct (${pct}%)</div>
+      <div class="result-grade ${gradeClass}">${grade}</div>
+      <button class="btn btn-primary" id="btn-restart" style="max-width: 220px; margin: 0 auto;">Restart quiz</button>
+      <div class="review-list">
+        <h3 style="font-size: 16px; margin-bottom: 12px;">Review by question</h3>
+        ${review}
+      </div>
+    </div>
+  `;
+  document.getElementById("btn-restart").addEventListener("click", () => {
+    state = { current: 0, answers: new Array(QUESTIONS.length).fill(null), score: 0, finished: false };
+    renderQuestion();
+    updateStats();
+  });
+}
+
+// ----- Init -----
+renderQuestion();
+updateStats();
+</script>
+</body>
+</html>
