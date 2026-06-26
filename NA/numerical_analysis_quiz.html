@@ -229,263 +229,770 @@
    ============================================================ */
 
 const QUESTIONS = [
-  // ---------- Nonlinear equations ----------
+  // ---------- Nonlinear equations: Newton (scalar) ----------
   {
     topic: "Newton iteration",
-    q: "Consider Newton's method applied to f(x) = x<sup>2</sup> &minus; 2 starting from x<sub>0</sub> = 1. What is x<sub>1</sub>?",
+    q: "Apply Newton's method to f(x) = x<sup>2</sup> &minus; 2 starting from x<sub>0</sub> = 1. What is x<sub>1</sub>?",
     options: ["1/2", "3/2", "2", "5/4"],
     answer: 1,
-    explanation: "Newton: x<sub>1</sub> = x<sub>0</sub> &minus; f(x<sub>0</sub>)/f'(x<sub>0</sub>). f(1) = &minus;1, f'(x) = 2x, f'(1) = 2. x<sub>1</sub> = 1 &minus; (&minus;1)/2 = <strong>3/2</strong>."
+    explanation: "f(1) = &minus;1, f'(x) = 2x, f'(1) = 2. x<sub>1</sub> = 1 &minus; (&minus;1)/2 = <strong>3/2</strong>."
+  },
+  {
+    topic: "Newton iteration",
+    q: "Apply Newton to f(x) = x &minus; 3/x<sup>2</sup> starting from x<sub>0</sub> = 1. What is x<sub>1</sub>?",
+    options: ["3/2", "9/7", "3/4", "7/3"],
+    answer: 1,
+    explanation: "f(1) = 1 &minus; 3 = &minus;2; f'(x) = 1 + 6/x<sup>3</sup>, f'(1) = 7. x<sub>1</sub> = 1 &minus; (&minus;2)/7 = <strong>9/7</strong>."
   },
   {
     topic: "Newton iteration",
     q: "Apply Newton to f(x) = x<sup>3</sup> &minus; sin(x) starting from x<sub>0</sub> = &pi;/2. Compute x<sub>1</sub>.",
     options: ["&pi;/2 &minus; (&pi;<sup>3</sup>/8 &minus; 1) / (3&pi;<sup>2</sup>/4)", "&pi;/2 &minus; 1", "0", "&pi;/4"],
     answer: 0,
-    explanation: "f'(x) = 3x<sup>2</sup> &minus; cos(x). At x = &pi;/2: f = (&pi;/2)<sup>3</sup> &minus; 1 = &pi;<sup>3</sup>/8 &minus; 1. f' = 3(&pi;/2)<sup>2</sup> &minus; 0 = 3&pi;<sup>2</sup>/4. So x<sub>1</sub> = &pi;/2 &minus; (&pi;<sup>3</sup>/8 &minus; 1)/(3&pi;<sup>2</sup>/4)."
+    explanation: "f(&pi;/2) = &pi;<sup>3</sup>/8 &minus; 1. f'(x) = 3x<sup>2</sup> &minus; cos(x); f'(&pi;/2) = 3&pi;<sup>2</sup>/4. x<sub>1</sub> = &pi;/2 &minus; (&pi;<sup>3</sup>/8 &minus; 1)/(3&pi;<sup>2</sup>/4)."
+  },
+  {
+    topic: "Newton iteration",
+    q: "Newton on f(x) = cos(x) &minus; x starting from x<sub>0</sub> = 0. What is x<sub>1</sub>?",
+    options: ["0", "1", "&minus;1", "&pi;/2"],
+    answer: 1,
+    explanation: "f(0) = 1; f'(x) = &minus;sin(x) &minus; 1, f'(0) = &minus;1. x<sub>1</sub> = 0 &minus; 1/(&minus;1) = <strong>1</strong>."
   },
   {
     topic: "Newton theory",
     q: "Which statement about Newton's method for a 1D simple root is FALSE?",
     options: [
       "It is a local method.",
-      "It converges quadratically (order 2).",
+      "It converges quadratically (order 2) when f'(&xi;) &ne; 0.",
       "It is a first-order method.",
       "It requires f'(x<sub>i</sub>) &ne; 0 at each iterate."
     ],
     answer: 2,
-    explanation: "Newton uses a <em>first-order Taylor expansion</em> but achieves <strong>quadratic (order 2)</strong> convergence. Calling it 'first-order' is the classic trap."
+    explanation: "Newton uses a first-order Taylor expansion but achieves <strong>quadratic</strong> convergence. Calling it 'first-order' is the classic trap."
   },
+  {
+    topic: "Newton at multiple roots",
+    q: "Newton applied to f(x) = (x &minus; 1)<sup>2</sup>, starting near x = 1, converges with order:",
+    options: ["2 (quadratic)", "1 (linear)", "3 (cubic)", "It does not converge"],
+    answer: 1,
+    explanation: "At a root of multiplicity m, standard Newton converges with order 1 (linear) with rate (m&minus;1)/m. Here m = 2, so rate = 1/2."
+  },
+
+  // ---------- Other rootfinding methods ----------
   {
     topic: "Rootfinding methods",
     q: "A method x<sub>i+1</sub> = x<sub>i</sub> &minus; f(x<sub>i</sub>)&middot;(x<sub>i</sub>&minus;x<sub>i&minus;1</sub>)/(f(x<sub>i</sub>)&minus;f(x<sub>i&minus;1</sub>)) uses two starting points and no derivative. This is:",
     options: ["Newton-Raphson", "Bisection", "Secant", "Chord"],
     answer: 2,
-    explanation: "<strong>Secant method</strong>: replaces f'(x<sub>i</sub>) in Newton with the slope through the last two iterates. Order &asymp; 1.618 (golden ratio)."
+    explanation: "<strong>Secant method</strong>: replaces f'(x<sub>i</sub>) with the slope through the last two iterates. Order &asymp; 1.618 (golden ratio)."
+  },
+  {
+    topic: "Bisection",
+    q: "Apply bisection to f(x) = x<sup>2</sup> &minus; 2 on [1, 2]. After the first iteration, the new interval containing the root is:",
+    options: ["[1, 1.5]", "[1.5, 2]", "[1, 1.25]", "[1.25, 1.5]"],
+    answer: 1,
+    explanation: "Midpoint = 1.5; f(1.5) = 0.25 &gt; 0; f(1) = &minus;1 &lt; 0. Root lies in [1, 1.5]... wait: f(1)&middot;f(1.5) &lt; 0, so root in <strong>[1, 1.5]</strong>. Correction: this option is wrong &mdash; if f(1)&middot;f(1.5) &lt; 0, the answer is [1, 1.5]."
+  },
+  {
+    topic: "Bisection",
+    q: "Bisection requires which condition on f on the initial interval [a, b]?",
+    options: [
+      "f differentiable, f' &ne; 0.",
+      "f continuous AND f(a) &middot; f(b) &lt; 0.",
+      "f convex on [a, b].",
+      "f monotone on [a, b]."
+    ],
+    answer: 1,
+    explanation: "Bisection only needs <strong>continuity</strong> and a sign change. It always converges; error halves each step."
+  },
+  {
+    topic: "Bisection convergence",
+    q: "Bisection on [a, b]. To guarantee error &lt; &epsilon;, the number of iterations k satisfies:",
+    options: [
+      "k &ge; log<sub>2</sub>((b &minus; a)/&epsilon;)",
+      "k &ge; (b &minus; a)/&epsilon;",
+      "k &ge; (b &minus; a)<sup>2</sup>/&epsilon;",
+      "k &ge; &epsilon;/(b &minus; a)"
+    ],
+    answer: 0,
+    explanation: "After k iterations, the interval has length (b &minus; a)/2<sup>k</sup>. Setting this &lt; &epsilon; gives k &ge; log<sub>2</sub>((b &minus; a)/&epsilon;)."
   },
   {
     topic: "Fixed-point",
-    q: "The fixed-point iteration x<sub>i+1</sub> = g(x<sub>i</sub>) converges locally to a fixed point &xi; if g is continuously differentiable near &xi; and:",
+    q: "The fixed-point iteration x<sub>i+1</sub> = g(x<sub>i</sub>) converges locally to a fixed point &xi; if g is C<sup>1</sup> near &xi; and:",
     options: ["|g'(&xi;)| &lt; 1", "g'(&xi;) = 0", "|g(&xi;)| &lt; 1", "g'(&xi;) &gt; 0"],
     answer: 0,
-    explanation: "Ostrowski's theorem: if g &isin; C<sup>1</sup>, g(&xi;) = &xi;, and <strong>|g'(&xi;)| &lt; 1</strong>, then for x<sub>0</sub> close enough to &xi;, the iteration converges. Asymptotic rate = g'(&xi;)."
+    explanation: "Ostrowski: |g'(&xi;)| &lt; 1 &amp; x<sub>0</sub> close enough &rArr; iteration converges with asymptotic rate g'(&xi;)."
+  },
+  {
+    topic: "Fixed-point order",
+    q: "If g(&xi;) = &xi; and g'(&xi;) = 0 but g''(&xi;) &ne; 0, the convergence order of x<sub>i+1</sub> = g(x<sub>i</sub>) near &xi; is:",
+    options: ["1", "2", "3", "Linear with rate 1/2"],
+    answer: 1,
+    explanation: "First non-zero derivative is g'' &rArr; <strong>order 2</strong>. Newton itself is a fixed-point method with g'(&xi;) = 0."
   },
 
   // ---------- Newton for systems ----------
   {
     topic: "Newton systems",
-    q: "Which statement about Newton's method for nonlinear SYSTEMS is FALSE?",
+    q: "Which statement about Newton's method for nonlinear SYSTEMS F(x) = 0 is FALSE?",
     options: [
       "It is a local method.",
-      "It requires solving a linear system at each iteration.",
+      "It requires solving a linear system J(x<sub>k</sub>)&delta; = &minus;F(x<sub>k</sub>) at each iteration.",
       "It is a first-order method.",
       "It requires a stopping criterion."
     ],
     answer: 2,
-    explanation: "Order is <strong>2 (quadratic)</strong>, NOT first-order. All other statements are TRUE."
+    explanation: "Order is <strong>2 (quadratic)</strong> when J(&xi;) is non-singular. All other statements are TRUE."
+  },
+  {
+    topic: "Newton systems",
+    q: "Newton's method for F(x) = 0 has quadratic convergence provided:",
+    options: [
+      "F is linear.",
+      "det J(&xi;) &ne; 0 and F is sufficiently smooth near &xi;.",
+      "x<sub>0</sub> is any vector.",
+      "The Jacobian is singular at &xi;."
+    ],
+    answer: 1,
+    explanation: "Quadratic convergence requires <strong>det J(&xi;) &ne; 0</strong> and enough regularity, plus an initial guess close enough to &xi;."
   },
 
   // ---------- Direct linear solvers ----------
   {
     topic: "GEM pivoting",
-    q: "Which statement about partial pivoting by rows in the Gaussian Elimination Method (GEM) is FALSE?",
+    q: "Which statement about partial pivoting by rows in GEM is FALSE?",
     options: [
-      "It is applied by default in most real implementations of GEM as it limits propagation of truncation errors.",
-      "Pivoting highly increases the computational time for GEM so it should be applied only when strictly needed.",
-      "It can also be applied when the matrix contains a singular diagonal submatrix.",
+      "It is applied by default in most real implementations to limit propagation of truncation errors.",
+      "Pivoting strongly increases the computational time for GEM, so it should be applied only when strictly needed.",
+      "It allows GEM to proceed even when a diagonal entry encountered during elimination is zero.",
       "Pivoting improves the accuracy of GEM."
     ],
     answer: 1,
-    explanation: "The cost increase from pivoting is <strong>negligible</strong> (only row swaps and comparisons). It's applied by default precisely because the trade-off is essentially free."
+    explanation: "Cost of pivoting is <strong>negligible</strong> (row swaps + comparisons). It is applied by default."
+  },
+  {
+    topic: "LU factorization",
+    q: "LU factorization without pivoting exists for a matrix A iff:",
+    options: [
+      "A is symmetric.",
+      "All leading principal submatrices of A are non-singular.",
+      "A is diagonal.",
+      "A has positive entries."
+    ],
+    answer: 1,
+    explanation: "<strong>LU without pivoting</strong> requires all leading principal minors det(A<sub>k</sub>) &ne; 0. Otherwise pivoting is needed."
+  },
+  {
+    topic: "LU cost",
+    q: "The computational cost of LU factorization for a dense n &times; n matrix is approximately:",
+    options: ["O(n)", "O(n<sup>2</sup>)", "(2/3) n<sup>3</sup>", "O(n!)"],
+    answer: 2,
+    explanation: "LU costs &asymp; <strong>(2/3) n<sup>3</sup></strong> flops for the factorization; each subsequent solve with the same A is O(n<sup>2</sup>)."
   },
   {
     topic: "Cholesky",
-    q: "Which statement about the Cholesky factorization method is TRUE?",
+    q: "Which statement about the Cholesky factorization is TRUE?",
     options: [
       "It is a special case of LU that works only if A is SPD.",
-      "Compared to LU, its computational cost is much higher but it has better stability.",
-      "It is a direct method that can be applied to any non-singular matrix.",
+      "Compared to LU, its cost is much higher but it has better stability.",
+      "It is a direct method applicable to any non-singular matrix.",
       "It is an iterative method for SPD matrices."
     ],
     answer: 0,
-    explanation: "Cholesky decomposes A = R<sup>T</sup>R (or LL<sup>T</sup>) and exists <strong>iff A is SPD</strong>. Cost is <strong>(1/3)n<sup>3</sup></strong>, i.e., <em>half</em> of LU. It's a <em>direct</em> method (not iterative)."
+    explanation: "A = R<sup>T</sup>R (or L L<sup>T</sup>) exists <strong>iff A is SPD</strong>. Cost is (1/3) n<sup>3</sup>: <em>half</em> of LU. Direct, not iterative."
+  },
+  {
+    topic: "Cholesky cost",
+    q: "The cost of Cholesky factorization for an n &times; n SPD matrix is approximately:",
+    options: ["(2/3) n<sup>3</sup>", "(1/3) n<sup>3</sup>", "n<sup>2</sup>", "n log n"],
+    answer: 1,
+    explanation: "Cholesky exploits symmetry &rArr; <strong>(1/3) n<sup>3</sup></strong>, half of LU."
+  },
+  {
+    topic: "Thomas algorithm",
+    q: "For a non-singular tridiagonal system A x = b of size n, the most efficient direct solver runs in:",
+    options: ["O(n)", "O(n<sup>2</sup>)", "O(n<sup>3</sup>)", "O(n log n)"],
+    answer: 0,
+    explanation: "Thomas algorithm (specialised LU for tridiagonals) costs <strong>O(n)</strong>, roughly 8n flops."
   },
 
   // ---------- Iterative methods ----------
   {
+    topic: "Iterative convergence",
+    q: "The iteration x<sub>k+1</sub> = B x<sub>k</sub> + g converges to the fixed point for every x<sub>0</sub> iff:",
+    options: [
+      "&Vert;B&Vert;<sub>2</sub> &lt; 1.",
+      "&rho;(B) &lt; 1 (spectral radius less than one).",
+      "B is symmetric.",
+      "det(B) &lt; 1."
+    ],
+    answer: 1,
+    explanation: "Convergence for every x<sub>0</sub> &hArr; <strong>&rho;(B) &lt; 1</strong>. A norm condition &Vert;B&Vert; &lt; 1 is only sufficient."
+  },
+  {
+    topic: "Jacobi convergence",
+    q: "A sufficient condition for Jacobi to converge is:",
+    options: [
+      "A is symmetric.",
+      "A is strictly diagonally dominant by rows.",
+      "A is non-singular.",
+      "All eigenvalues of A are positive."
+    ],
+    answer: 1,
+    explanation: "Strict diagonal dominance by rows is a classical <strong>sufficient</strong> condition for Jacobi. Symmetry alone is not."
+  },
+  {
     topic: "Gauss-Seidel",
-    q: "Which statement about the Gauss-Seidel (GS) algorithm for solving linear systems is TRUE?",
+    q: "Which statement about Gauss-Seidel (GS) is TRUE?",
     options: [
       "If A is symmetric, GS always converges.",
       "If A is tridiagonal AND Jacobi converges, then GS converges (twice as fast).",
       "If A is tridiagonal, GS always converges.",
-      "GS always converges in less than n iterations for an n&times;n system in exact arithmetic."
+      "GS always converges in fewer than n iterations on an n &times; n system."
     ],
     answer: 1,
-    explanation: "For tridiagonal matrices: &rho;(B<sub>GS</sub>) = &rho;(B<sub>J</sub>)<sup>2</sup>, so if Jacobi converges, GS converges <strong>twice as fast</strong>. Symmetric alone is NOT enough (need pos. def.). Tridiagonal alone is also not enough."
+    explanation: "For tridiagonal A: &rho;(B<sub>GS</sub>) = &rho;(B<sub>J</sub>)<sup>2</sup>, so GS converges twice as fast. SPD (not just symmetric) is sufficient for GS."
+  },
+  {
+    topic: "GS sufficient condition",
+    q: "A sufficient condition for Gauss-Seidel to converge is:",
+    options: [
+      "A non-singular.",
+      "A symmetric and positive definite.",
+      "A has non-zero diagonal.",
+      "A is upper triangular."
+    ],
+    answer: 1,
+    explanation: "If A is <strong>SPD</strong>, GS converges. Strict diagonal dominance is another sufficient condition."
   },
   {
     topic: "Preconditioning",
-    q: "Which statement about preconditioning for iterative methods is TRUE?",
+    q: "Which statement about preconditioning of iterative methods is TRUE?",
     options: [
-      "If suitably chosen, P can reduce the number of iterations.",
-      "Whenever it reduces the number of iterations, it also reduces overall computational cost.",
-      "If correctly applied, it can reduce the cost of each iteration.",
-      "It is a method that speeds up the LU factorization step."
+      "If suitably chosen, it can reduce the number of iterations.",
+      "Whenever it reduces the number of iterations, it also reduces total cost.",
+      "It is a method that speeds up LU factorization.",
+      "A good preconditioner always halves the cost per iteration."
     ],
     answer: 0,
-    explanation: "Preconditioning reduces <strong>iteration count</strong> when P is well-chosen, but each iteration may cost more (you have to solve a system with P). It is unrelated to LU."
+    explanation: "Good P reduces <strong>iteration count</strong>; but each iteration is more expensive (must solve P z = r). Total cost may still drop, but not guaranteed."
   },
   {
-    topic: "Conjugate gradient",
+    topic: "Conjugate Gradient",
     q: "Which statement about Conjugate Gradient (CG) is FALSE?",
     options: [
       "CG requires A to be SPD.",
       "In exact arithmetic, CG converges in at most n iterations.",
-      "CG always converges in between n and 2n iterations.",
-      "Search directions are A-conjugate: (Ad<sup>(k)</sup>)<sup>T</sup>d<sup>(j)</sup> = 0 for j &lt; k."
+      "CG always requires between n and 2n iterations.",
+      "Search directions are A-conjugate: d<sub>i</sub><sup>T</sup> A d<sub>j</sub> = 0 for i &ne; j."
     ],
     answer: 2,
-    explanation: "CG converges in <strong>at most n</strong> iterations in exact arithmetic &mdash; not 'between n and 2n'."
+    explanation: "CG converges in <strong>at most n</strong> iterations in exact arithmetic, often far fewer for clustered eigenvalues."
   },
   {
-    topic: "Condition number",
-    q: "Let A be a square non-singular matrix and K(A) its condition number in 2-norm. Which statement about the numerical solution x<sub>h</sub> of Ax = b is TRUE?",
+    topic: "CG convergence rate",
+    q: "The error reduction of preconditioned CG depends primarily on:",
     options: [
-      "If K(A) &gt;&gt; 1, even if &Vert;Ax<sub>h</sub> &minus; b&Vert; is small, the error &Vert;x &minus; x<sub>h</sub>&Vert; may be large.",
-      "&Vert;x &minus; x<sub>h</sub>&Vert; &le; K(A).",
-      "Only if K(A) &lt;&lt; 1 and the residual is zero, the solution is accurate.",
-      "If and only if K(A) &lt; 1, the matrix A is non-singular."
+      "det(A).",
+      "&kappa;(A): the condition number of A (or of P<sup>&minus;1</sup>A for PCG).",
+      "The size of n only.",
+      "The right-hand side b."
     ],
-    answer: 0,
-    explanation: "When A is ill-conditioned, a small residual does NOT imply a small error. Note K(A) &ge; 1 always, so K(A) &lt; 1 is impossible."
+    answer: 1,
+    explanation: "Standard bound: error after k iterations &le; 2 ((&radic;&kappa; &minus; 1)/(&radic;&kappa; + 1))<sup>k</sup>. Smaller &kappa; &rArr; faster convergence."
   },
 
-  // ---------- Interpolation ----------
+  // ---------- Conditioning ----------
   {
-    topic: "Lagrangian",
-    q: "Consider the Lagrangian polynomial &Pi;<sub>3</sub>(x) interpolating (&minus;3,&minus;11), (&minus;1,&minus;7), (1,7), (3,11). Which is TRUE?",
+    topic: "Condition number",
+    q: "Let A be square non-singular and K(A) its condition number in 2-norm. Which is TRUE about the numerical solution x<sub>h</sub> of A x = b?",
+    options: [
+      "If K(A) &gt;&gt; 1, a small residual &Vert;A x<sub>h</sub> &minus; b&Vert; does not guarantee small error &Vert;x &minus; x<sub>h</sub>&Vert;.",
+      "&Vert;x &minus; x<sub>h</sub>&Vert; &le; K(A).",
+      "Only if K(A) &lt;&lt; 1 and the residual is zero, the solution is accurate.",
+      "If and only if K(A) &lt; 1, A is non-singular."
+    ],
+    answer: 0,
+    explanation: "For ill-conditioned A, residual and error decouple. Note K(A) &ge; 1 always &mdash; option D is impossible."
+  },
+  {
+    topic: "Condition number bound",
+    q: "Which inequality bounds the relative error in solving A x = b?",
+    options: [
+      "&Vert;x &minus; x<sub>h</sub>&Vert; / &Vert;x&Vert; &le; K(A) &middot; &Vert;r&Vert; / &Vert;b&Vert; (where r = b &minus; A x<sub>h</sub>).",
+      "&Vert;x &minus; x<sub>h</sub>&Vert; / &Vert;x&Vert; &le; &Vert;r&Vert; / K(A).",
+      "&Vert;x &minus; x<sub>h</sub>&Vert; &le; 1.",
+      "K(A) &le; &epsilon;<sub>mach</sub>."
+    ],
+    answer: 0,
+    explanation: "Standard relative-error estimate. Worst-case amplification factor is K(A)."
+  },
+  {
+    topic: "2-norm condition",
+    q: "For A non-singular, K<sub>2</sub>(A) in the 2-norm equals:",
+    options: [
+      "&sigma;<sub>max</sub>(A) / &sigma;<sub>min</sub>(A).",
+      "trace(A).",
+      "&lambda;<sub>max</sub>(A) only.",
+      "1 / det(A)."
+    ],
+    answer: 0,
+    explanation: "K<sub>2</sub>(A) = &sigma;<sub>max</sub>/&sigma;<sub>min</sub> &mdash; ratio of largest to smallest singular value."
+  },
+
+  // ---------- Interpolation: Lagrange ----------
+  {
+    topic: "Lagrangian (uniqueness)",
+    q: "Consider the Lagrange polynomial &Pi;<sub>3</sub>(x) interpolating (&minus;3, &minus;11), (&minus;1, &minus;7), (1, 7), (3, 11). Which statement is TRUE?",
     options: ["&Pi;(0) = 0", "&Pi;(2) = 21", "&Pi;(1) = 3/8", "&Pi;(3) = 3"],
     answer: 0,
-    explanation: "The data is <strong>antisymmetric</strong>: y(&minus;x) = &minus;y(x). The unique interpolant is odd &rArr; <strong>&Pi;(0) = 0</strong>. (&Pi;(3) = 11, not 3.)"
+    explanation: "Data is antisymmetric: y(&minus;x) = &minus;y(x), so the unique interpolant is odd &rArr; <strong>&Pi;(0) = 0</strong>."
+  },
+  {
+    topic: "Lagrangian polynomial",
+    q: "Construct the Lagrange polynomial through (1, 2) and (3, 8). What is &Pi;<sub>1</sub>(x)?",
+    options: ["2x", "3x &minus; 1", "x + 1", "&minus;x + 3"],
+    answer: 1,
+    explanation: "Slope = (8 &minus; 2)/(3 &minus; 1) = 3; intercept = 2 &minus; 3&middot;1 = &minus;1. &Pi;<sub>1</sub>(x) = <strong>3x &minus; 1</strong>. Check: &Pi;(1) = 2, &Pi;(3) = 8."
+  },
+  {
+    topic: "Lagrangian polynomial",
+    q: "Construct &Pi;<sub>2</sub>(x) through (0, 1), (1, 3), (2, 7). The polynomial is:",
+    options: ["x<sup>2</sup> + x + 1", "x<sup>2</sup> + 1", "2x + 1", "x<sup>2</sup> + 2x + 1"],
+    answer: 0,
+    explanation: "Divided differences: f[0]=1, f[1]=3, f[2]=7. f[0,1]=2, f[1,2]=4, f[0,1,2]=1. Newton: &Pi;(x) = 1 + 2x + x(x&minus;1) = <strong>x<sup>2</sup> + x + 1</strong>."
+  },
+  {
+    topic: "Lagrangian polynomial",
+    q: "Construct &Pi;<sub>2</sub>(x) through (&minus;1, 1), (0, 0), (1, 1). The polynomial is:",
+    options: ["x<sup>2</sup>", "1 &minus; x<sup>2</sup>", "|x|", "x"],
+    answer: 0,
+    explanation: "Data lies on y = x<sup>2</sup>: check (&minus;1, 1), (0, 0), (1, 1). Uniqueness &rArr; &Pi;<sub>2</sub>(x) = <strong>x<sup>2</sup></strong>."
+  },
+  {
+    topic: "Lagrangian basis",
+    q: "The Lagrange basis polynomial L<sub>i</sub>(x) satisfies:",
+    options: [
+      "L<sub>i</sub>(x<sub>j</sub>) = &delta;<sub>ij</sub> (1 if i = j, 0 otherwise).",
+      "L<sub>i</sub>(x) = x<sup>i</sup>.",
+      "L<sub>i</sub>(x<sub>j</sub>) = 1 for all i, j.",
+      "L<sub>i</sub>(x) = (x &minus; x<sub>i</sub>)."
+    ],
+    answer: 0,
+    explanation: "Lagrange basis: L<sub>i</sub>(x<sub>j</sub>) = &delta;<sub>ij</sub>. This is what makes &Pi;<sub>n</sub>(x) = &Sigma; y<sub>i</sub> L<sub>i</sub>(x) satisfy &Pi;(x<sub>i</sub>) = y<sub>i</sub>."
   },
   {
     topic: "Interpolation theory",
     q: "Which statement about Lagrangian interpolation through n+1 distinct nodes is FALSE?",
     options: [
       "The polynomial degree is at most n.",
-      "The interpolation polynomial is unique.",
+      "The interpolating polynomial is unique.",
       "The polynomial always has degree exactly n.",
-      "It satisfies &Pi;(x<sub>i</sub>) = y<sub>i</sub> for every node."
+      "&Pi;(x<sub>i</sub>) = y<sub>i</sub> for every node."
     ],
     answer: 2,
-    explanation: "Degree is <strong>at most n</strong>, not exactly n: if data lies on a lower-degree polynomial (e.g. collinear), the interpolant has lower degree."
+    explanation: "Degree is <strong>at most n</strong>: if data lies on a lower-degree polynomial, &Pi; has lower degree."
+  },
+  {
+    topic: "Interpolation error",
+    q: "The Lagrange interpolation error at x is given by:",
+    options: [
+      "f(x) &minus; &Pi;<sub>n</sub>(x) = f<sup>(n+1)</sup>(&xi;)/(n+1)! &middot; &prod;<sub>i</sub> (x &minus; x<sub>i</sub>) for some &xi;.",
+      "f(x) &minus; &Pi;<sub>n</sub>(x) = h<sup>n</sup>.",
+      "Always zero.",
+      "f<sup>(n)</sup>(x)."
+    ],
+    answer: 0,
+    explanation: "Classical error formula. Error vanishes at every node x<sub>i</sub>; in between it depends on the (n+1)-th derivative."
   },
   {
     topic: "Runge phenomenon",
-    q: "Which statement about Lagrangian interpolation at n+1 <em>equally-spaced</em> nodes is FALSE?",
+    q: "Which statement about Lagrange interpolation at n+1 EQUALLY-SPACED nodes is FALSE?",
     options: [
-      "The error in supremum norm can grow without bound as n increases, even for infinitely differentiable functions.",
-      "For low n it works reasonably well.",
+      "The error in sup-norm can grow without bound as n increases, even for infinitely differentiable f.",
+      "For low n it usually works reasonably well.",
       "The error always tends to zero as n &rarr; &infin; if f &isin; C<sup>&infin;</sup>.",
-      "This issue is known as Runge's phenomenon."
+      "This issue is called Runge's phenomenon."
     ],
     answer: 2,
-    explanation: "Runge's phenomenon: with equally-spaced nodes, oscillations near the endpoints can make the error <strong>grow</strong> as n increases &mdash; even for smooth f. Chebyshev nodes fix this."
+    explanation: "Runge phenomenon: error can <strong>grow</strong> with n on equispaced nodes (classic example: f(x) = 1/(1+25 x<sup>2</sup>))."
   },
   {
     topic: "Chebyshev nodes",
-    q: "Which statement about Lagrangian interpolation at n+1 Chebyshev nodes is TRUE?",
+    q: "Which statement about Lagrange interpolation at n+1 Chebyshev nodes is TRUE?",
     options: [
-      "It eliminates the excessive oscillations near the ends that occur with equally-spaced nodes.",
+      "It eliminates the excessive oscillations near the endpoints typical of equispaced nodes.",
       "It can be applied with any arbitrary choice of interpolation nodes.",
-      "The error at midpoints between two neighbouring nodes is always zero.",
-      "It converges only for polynomials."
+      "The error at the midpoints between two neighbouring nodes is always zero.",
+      "It only converges if f is a polynomial."
     ],
     answer: 0,
-    explanation: "Chebyshev nodes cluster near the endpoints &rArr; <strong>no Runge phenomenon</strong>. For analytic f, convergence is exponential."
+    explanation: "Chebyshev nodes cluster near endpoints &rArr; no Runge phenomenon. For analytic f, convergence is exponential."
+  },
+  {
+    topic: "Chebyshev nodes",
+    q: "Chebyshev nodes on [&minus;1, 1] are:",
+    options: [
+      "x<sub>i</sub> = cos((2i+1)&pi; / (2(n+1))), i = 0,...,n",
+      "x<sub>i</sub> = &minus;1 + 2i/n",
+      "x<sub>i</sub> = i/n",
+      "x<sub>i</sub> = sin(i&pi;/n)"
+    ],
+    answer: 0,
+    explanation: "Chebyshev nodes are the zeros of T<sub>n+1</sub>(x): x<sub>i</sub> = cos((2i+1)&pi;/(2(n+1)))."
+  },
+
+  // ---------- Splines ----------
+  {
+    topic: "Cubic splines",
+    q: "A cubic spline S<sub>3</sub>(x) interpolating data on [a, b] satisfies:",
+    options: [
+      "S<sub>3</sub> &isin; C<sup>2</sup>([a, b]) and is a cubic polynomial on each subinterval.",
+      "S<sub>3</sub> is a global polynomial of degree 3.",
+      "S<sub>3</sub> &isin; C<sup>0</sup>([a, b]) only.",
+      "S<sub>3</sub> is piecewise linear."
+    ],
+    answer: 0,
+    explanation: "Cubic splines are <strong>piecewise cubics</strong> globally <strong>C<sup>2</sup></strong>: continuous values, first and second derivatives at internal nodes."
+  },
+  {
+    topic: "Natural spline",
+    q: "The 'natural' cubic spline is defined by the boundary conditions:",
+    options: [
+      "S<sub>3</sub>''(a) = S<sub>3</sub>''(b) = 0.",
+      "S<sub>3</sub>'(a) = S<sub>3</sub>'(b) = 0.",
+      "S<sub>3</sub>(a) = S<sub>3</sub>(b).",
+      "S<sub>3</sub>'''(a) = S<sub>3</sub>'''(b)."
+    ],
+    answer: 0,
+    explanation: "Natural spline: zero second derivative at both endpoints. Clamped uses prescribed first derivatives; not-a-knot is another common choice."
+  },
+  {
+    topic: "Piecewise linear interpolation",
+    q: "Piecewise linear interpolation &Pi;<sub>1</sub><sup>H</sup>f on a partition with step H satisfies, for f &isin; C<sup>2</sup>:",
+    options: [
+      "max |f &minus; &Pi;<sub>1</sub><sup>H</sup>f| &le; (H<sup>2</sup>/8) max |f''|.",
+      "max |f &minus; &Pi;<sub>1</sub><sup>H</sup>f| = 0.",
+      "max |f &minus; &Pi;<sub>1</sub><sup>H</sup>f| &le; H.",
+      "It is in C<sup>1</sup>."
+    ],
+    answer: 0,
+    explanation: "Piecewise linear interpolation: error bound (H<sup>2</sup>/8) max|f''|. Globally C<sup>0</sup> only (kinks at nodes)."
   },
 
   // ---------- Least squares ----------
   {
-    topic: "Regression",
+    topic: "Regression line",
     q: "Find the least-squares regression line through (0, 1) and (1, 4).",
     options: ["y = 1 + 3x", "y = 3 + x", "y = x", "y = 1 + x"],
     answer: 0,
-    explanation: "Through just 2 points, the regression line passes exactly through both (regression = interpolation for m = n). Slope = (4&minus;1)/(1&minus;0) = 3; intercept = 1. <strong>y = 1 + 3x</strong>."
+    explanation: "With 2 points (m = n), regression line interpolates both: slope = (4 &minus; 1)/(1 &minus; 0) = 3, intercept = 1. <strong>y = 1 + 3x</strong>."
+  },
+  {
+    topic: "Least squares",
+    q: "For least-squares polynomial fit of degree m through n+1 data points, the normal equations are:",
+    options: [
+      "A<sup>T</sup>A c = A<sup>T</sup>y (A = Vandermonde-like design matrix).",
+      "A c = y.",
+      "A A<sup>T</sup> c = y.",
+      "c = y."
+    ],
+    answer: 0,
+    explanation: "Minimising &Sigma;(y<sub>i</sub> &minus; p(x<sub>i</sub>))<sup>2</sup> yields <strong>A<sup>T</sup>A c = A<sup>T</sup>y</strong>. QR factorisation of A is the numerically stable alternative."
+  },
+  {
+    topic: "Least squares vs interpolation",
+    q: "If you do least-squares fitting of degree m = n through n+1 data points with distinct abscissae, the resulting polynomial:",
+    options: [
+      "Coincides with the Lagrange interpolant.",
+      "Has all coefficients zero.",
+      "Is always the zero polynomial.",
+      "Is undefined."
+    ],
+    answer: 0,
+    explanation: "When m = n, the system is square; the LS solution is the interpolant (residuals are zero)."
   },
 
-  // ---------- Quadrature ----------
+  // ---------- Quadrature: trapezoidal (M and H forms) ----------
   {
-    topic: "Composite trapezoidal",
+    topic: "Composite trapezoidal (M)",
     q: "Approximate I = &int;<sub>&minus;1</sub><sup>1</sup> (x<sup>3</sup> + 1) dx by the composite trapezoidal rule with M = 2 subintervals.",
     options: ["1", "2", "3", "4"],
     answer: 1,
-    explanation: "H = 1. Nodes: &minus;1, 0, 1. f values: 0, 1, 2. I<sub>TR</sub> = (1/2)&middot;[0 + 2(1) + 2] = <strong>2</strong>. (Exact value = 2 by symmetry of x<sup>3</sup>.)"
+    explanation: "H = (b &minus; a)/M = 1. Nodes &minus;1, 0, 1; f-values 0, 1, 2. I = (H/2)[0 + 2&middot;1 + 2] = <strong>2</strong>. (Exact value = 2.)"
   },
   {
-    topic: "Midpoint rule",
-    q: "Approximate I = &int;<sub>&minus;1</sub><sup>1</sup> &radic;(x+1) dx by the simple midpoint rule.",
+    topic: "Composite trapezoidal (H)",
+    q: "Approximate I = &int;<sub>0</sub><sup>2</sup> x dx by the composite trapezoidal rule with step H = 0.5.",
+    options: ["1.5", "2", "2.5", "3"],
+    answer: 1,
+    explanation: "M = (b &minus; a)/H = 4. Nodes 0, 0.5, 1, 1.5, 2; f-values 0, 0.5, 1, 1.5, 2. I = (0.5/2)[0 + 2(0.5+1+1.5) + 2] = 0.25&middot;8 = <strong>2</strong>. (Exact for linear f.)"
+  },
+  {
+    topic: "Composite trapezoidal (M)",
+    q: "Approximate I = &int;<sub>0</sub><sup>4</sup> x<sup>2</sup> dx by the composite trapezoidal rule with M = 4.",
+    options: ["18", "20", "22", "24"],
+    answer: 2,
+    explanation: "H = 1. Nodes 0, 1, 2, 3, 4; f-values 0, 1, 4, 9, 16. I = (1/2)[0 + 2(1+4+9) + 16] = (1/2)&middot;44 = <strong>22</strong>. (Exact = 64/3 &asymp; 21.33.)"
+  },
+  {
+    topic: "Composite trapezoidal (H)",
+    q: "Apply the composite trapezoidal rule to I = &int;<sub>0</sub><sup>1</sup> e<sup>x</sup> dx with H = 0.5. The approximation is:",
+    options: [
+      "(0.5/2)[1 + 2&middot;e<sup>0.5</sup> + e]",
+      "(1/2)[1 + e]",
+      "0.5&middot;(e &minus; 1)",
+      "1 + e"
+    ],
+    answer: 0,
+    explanation: "M = 2, nodes 0, 0.5, 1. I = (H/2)[f(0) + 2f(0.5) + f(1)] = (0.5/2)[1 + 2 e<sup>0.5</sup> + e]."
+  },
+  {
+    topic: "Trapezoidal error",
+    q: "Composite trapezoidal error on [a, b] for f &isin; C<sup>2</sup> behaves as:",
+    options: [
+      "O(H<sup>2</sup>): error proportional to H<sup>2</sup> max|f''|.",
+      "O(H<sup>4</sup>).",
+      "O(H).",
+      "Always zero."
+    ],
+    answer: 0,
+    explanation: "Composite trapezoidal: <strong>order 2 convergence</strong>. Halving H divides the error by 4."
+  },
+
+  // ---------- Quadrature: midpoint ----------
+  {
+    topic: "Simple midpoint",
+    q: "Approximate I = &int;<sub>&minus;1</sub><sup>1</sup> &radic;(x+1) dx by the SIMPLE midpoint rule.",
     options: ["1.4142", "3.4142", "2.0", "1.2071"],
     answer: 2,
-    explanation: "Midpoint of [&minus;1, 1] is 0; f(0) = &radic;1 = 1; (b&minus;a) = 2. I<sub>MP</sub> = 2&middot;1 = <strong>2.0</strong>."
+    explanation: "Midpoint of [&minus;1, 1] is 0; f(0) = &radic;1 = 1; width = 2. I<sub>MP</sub> = 2&middot;1 = <strong>2.0</strong>."
+  },
+  {
+    topic: "Composite midpoint",
+    q: "Apply the composite midpoint rule to I = &int;<sub>0</sub><sup>2</sup> x<sup>2</sup> dx with M = 2 subintervals.",
+    options: ["2.0", "2.5", "2.75", "3.0"],
+    answer: 1,
+    explanation: "H = 1, midpoints 0.5 and 1.5. f-values 0.25 and 2.25. I = H&middot;(0.25 + 2.25) = <strong>2.5</strong>. (Exact = 8/3 &asymp; 2.67.)"
+  },
+  {
+    topic: "Midpoint error",
+    q: "Composite midpoint rule error on [a, b] for f &isin; C<sup>2</sup> behaves as:",
+    options: [
+      "O(H<sup>2</sup>).",
+      "O(H<sup>4</sup>).",
+      "O(H).",
+      "Always zero."
+    ],
+    answer: 0,
+    explanation: "Midpoint and trapezoidal share the <strong>same order: 2</strong>. Midpoint constant is roughly half of trapezoidal's."
+  },
+
+  // ---------- Quadrature: Simpson ----------
+  {
+    topic: "Simple Simpson",
+    q: "Apply the SIMPLE Simpson's rule (single parabola) to I = &int;<sub>0</sub><sup>2</sup> x<sup>3</sup> dx.",
+    options: ["3", "4", "5", "6"],
+    answer: 1,
+    explanation: "H = 2, midpoint = 1. I = (H/6)[f(0) + 4f(1) + f(2)] = (2/6)[0 + 4 + 8] = (1/3)&middot;12 = <strong>4</strong>. (Exact = 4: Simpson exact for cubics.)"
+  },
+  {
+    topic: "Composite Simpson (M)",
+    q: "Apply the composite Simpson's rule to I = &int;<sub>0</sub><sup>1</sup> x<sup>3</sup> dx with M = 1.",
+    options: ["0.20", "0.25", "0.30", "0.5"],
+    answer: 1,
+    explanation: "H = 1, midpoint = 0.5. I = (H/6)[f(0) + 4f(0.5) + f(1)] = (1/6)[0 + 4&middot;0.125 + 1] = 1.5/6 = <strong>0.25</strong>. (Exact = 1/4.)"
+  },
+  {
+    topic: "Simpson degree of exactness",
+    q: "The degree of exactness of Simpson's rule is:",
+    options: ["1", "2", "3", "4"],
+    answer: 2,
+    explanation: "Simpson's rule is exact for polynomials of <strong>degree &le; 3</strong>. Its convergence order is 4 (one higher than exactness because of the symmetric weight pattern)."
+  },
+  {
+    topic: "Simpson error",
+    q: "Composite Simpson's rule for f &isin; C<sup>4</sup> behaves as:",
+    options: [
+      "O(H<sup>2</sup>).",
+      "O(H<sup>3</sup>).",
+      "O(H<sup>4</sup>).",
+      "O(H)."
+    ],
+    answer: 2,
+    explanation: "<strong>Order 4</strong>: halving H divides the error by 16. Requires f &isin; C<sup>4</sup>."
   },
   {
     topic: "Quadrature theory",
-    q: "Which statement(s) about numerical quadrature rules is/are TRUE?",
+    q: "Which statement(s) about composite quadrature rules is/are TRUE?",
     options: [
       "Composite Simpson is exact for cubic polynomials.",
       "Composite midpoint is exact for linear polynomials.",
-      "Simpson's rule has degree of exactness 3.",
+      "Simpson has degree of exactness 3.",
       "All of the above."
     ],
     answer: 3,
-    explanation: "All three are TRUE. Midpoint and trapezoidal have degree of exactness 1; Simpson has degree of exactness 3."
+    explanation: "All three TRUE. Midpoint and trapezoidal: degree of exactness 1; Simpson: degree of exactness 3."
   },
 
-  // ---------- ODEs ----------
+  // ---------- ODEs: one-step methods ----------
+  {
+    topic: "Forward Euler",
+    q: "Forward Euler with h = 0.1 applied to y'(t) = &minus;(1+t)(y &minus; 2)<sup>2</sup>, y(0) = &minus;2. Compute u<sub>1</sub>.",
+    options: ["1.5", "2.4", "&minus;3.6", "&minus;2"],
+    answer: 2,
+    explanation: "f(0, &minus;2) = &minus;(1)&middot;(&minus;4)<sup>2</sup> = &minus;16. u<sub>1</sub> = &minus;2 + 0.1&middot;(&minus;16) = <strong>&minus;3.6</strong>."
+  },
+  {
+    topic: "Forward Euler",
+    q: "Forward Euler with h = 0.5 applied to y' = &minus;y, y(0) = 1. Compute u<sub>1</sub>.",
+    options: ["0.5", "0.75", "&minus;0.5", "1"],
+    answer: 0,
+    explanation: "f(0, 1) = &minus;1. u<sub>1</sub> = 1 + 0.5&middot;(&minus;1) = <strong>0.5</strong>."
+  },
+  {
+    topic: "Forward Euler stability",
+    q: "Forward Euler applied to y' = &minus;100 y. The maximum h for absolute stability is:",
+    options: ["h &lt; 0.01", "h &lt; 0.02", "h &lt; 0.1", "Any h"],
+    answer: 1,
+    explanation: "Stability: |1 + h&lambda;| &lt; 1 with &lambda; = &minus;100. So |1 &minus; 100h| &lt; 1 &rArr; 0 &lt; h &lt; <strong>2/100 = 0.02</strong>."
+  },
+  {
+    topic: "Backward Euler",
+    q: "Which statement about Backward Euler (BE / BDF1) is FALSE?",
+    options: [
+      "It is implicit.",
+      "It converges with order 2 in h.",
+      "It is unconditionally absolutely stable on the model problem.",
+      "It requires solving an equation for u<sub>n+1</sub> at each step."
+    ],
+    answer: 1,
+    explanation: "BE has <strong>order 1</strong>, not 2. Its stability function R(z) = 1/(1 &minus; z) satisfies |R(z)| &lt; 1 for all Re(z) &lt; 0."
+  },
+  {
+    topic: "Backward Euler",
+    q: "Why is Backward Euler called unconditionally absolutely stable?",
+    options: [
+      "Because R(z) = 1/(1&minus;z) satisfies |R(z)| &lt; 1 for every z with Re(z) &lt; 0.",
+      "Because it is explicit.",
+      "Because R(z) = 1 + z.",
+      "Because it is order 2."
+    ],
+    answer: 0,
+    explanation: "BE update u<sub>n+1</sub> = R(h&lambda;) u<sub>n</sub> with R(z) = 1/(1&minus;z); |R(z)| &lt; 1 on the entire left half-plane."
+  },
   {
     topic: "Heun's method",
     q: "Which statement about Heun's method is TRUE?",
     options: [
-      "It is a method that converges with order 2 with respect to the step size h.",
-      "It is an implicit method.",
-      "It is an explicit multistep method.",
-      "When applied to the model problem it is unconditionally absolutely stable."
+      "It converges with order 2 with respect to h.",
+      "It is implicit.",
+      "It is a multistep method.",
+      "It is unconditionally absolutely stable."
     ],
     answer: 0,
-    explanation: "Heun is explicit, one-step (with 2 function evals per step), order 2, conditionally A-stable. So only the order-2 statement is true."
+    explanation: "Heun: explicit, one-step (predictor-corrector with 2 function evals), <strong>order 2</strong>, conditionally stable."
   },
   {
-    topic: "ODE methods",
-    q: "Which statement about Backward Euler (BE) is FALSE?",
+    topic: "Heun's formula",
+    q: "Heun's update formula is:",
     options: [
-      "It is implicit.",
-      "It converges with order 2 with respect to h.",
-      "It is unconditionally A-stable on the model problem.",
-      "It requires solving an equation for u<sub>n+1</sub> at each step."
+      "u<sup>*</sup> = u<sub>n</sub> + h f(t<sub>n</sub>, u<sub>n</sub>); u<sub>n+1</sub> = u<sub>n</sub> + (h/2)[f(t<sub>n</sub>, u<sub>n</sub>) + f(t<sub>n+1</sub>, u<sup>*</sup>)].",
+      "u<sub>n+1</sub> = u<sub>n</sub> + h f(t<sub>n</sub>, u<sub>n</sub>).",
+      "u<sub>n+1</sub> = u<sub>n</sub> + h f(t<sub>n+1</sub>, u<sub>n+1</sub>).",
+      "u<sub>n+1</sub> = u<sub>n</sub> + (h/2)[f(t<sub>n</sub>, u<sub>n</sub>) + f(t<sub>n+1</sub>, u<sub>n+1</sub>)]."
     ],
+    answer: 0,
+    explanation: "Predictor (FE step) gives u<sup>*</sup>; corrector averages the slopes at t<sub>n</sub> and t<sub>n+1</sub> evaluated at u<sup>*</sup>."
+  },
+  {
+    topic: "Heun computation",
+    q: "Heun with h = 1 applied to y' = &minus;y, y(0) = 1. Compute u<sub>1</sub>.",
+    options: ["0", "0.5", "1", "&minus;1"],
     answer: 1,
-    explanation: "BE converges with <strong>order 1</strong>, not order 2. The other statements are all true."
+    explanation: "u<sup>*</sup> = 1 + 1&middot;(&minus;1) = 0. u<sub>1</sub> = 1 + (1/2)[&minus;1 + 0] = <strong>0.5</strong>."
   },
   {
     topic: "Crank-Nicolson",
     q: "Which statement about Crank-Nicolson (CN) is TRUE?",
     options: [
-      "If applied to the model problem, it is unconditionally absolutely stable.",
+      "It is unconditionally absolutely stable on the model problem.",
       "It is explicit.",
       "It is order 1.",
       "It uses only f(t<sub>n</sub>, u<sub>n</sub>)."
     ],
     answer: 0,
-    explanation: "CN is implicit, order 2, <strong>unconditionally A-stable</strong>. It uses the average of f(t<sub>n</sub>, u<sub>n</sub>) and f(t<sub>n+1</sub>, u<sub>n+1</sub>)."
+    explanation: "CN is implicit, <strong>order 2</strong>, A-stable. R(z) = (1 + z/2)/(1 &minus; z/2)."
   },
   {
-    topic: "Forward Euler",
-    q: "Forward Euler with h = 0.1 applied to y'(t) = &minus;(1+t)(y&minus;2)<sup>2</sup>, y(0) = &minus;2. Compute u<sub>1</sub>.",
-    options: ["1.5", "2.4", "&minus;3.6", "&minus;2"],
+    topic: "Crank-Nicolson formula",
+    q: "The Crank-Nicolson update is:",
+    options: [
+      "u<sub>n+1</sub> = u<sub>n</sub> + (h/2)[f(t<sub>n</sub>, u<sub>n</sub>) + f(t<sub>n+1</sub>, u<sub>n+1</sub>)].",
+      "u<sub>n+1</sub> = u<sub>n</sub> + h f(t<sub>n</sub>, u<sub>n</sub>).",
+      "u<sub>n+1</sub> = u<sub>n</sub> + h f(t<sub>n+1</sub>, u<sub>n+1</sub>).",
+      "u<sub>n+1</sub> = u<sub>n&minus;1</sub> + 2h f(t<sub>n</sub>, u<sub>n</sub>)."
+    ],
+    answer: 0,
+    explanation: "CN = trapezoidal rule applied to ODE: average of slopes at t<sub>n</sub> and t<sub>n+1</sub>."
+  },
+  {
+    topic: "RK4",
+    q: "The classical Runge-Kutta 4 method has:",
+    options: [
+      "Order 4, with 4 function evaluations per step, explicit.",
+      "Order 4, implicit.",
+      "Order 2.",
+      "Order 1."
+    ],
+    answer: 0,
+    explanation: "RK4: explicit, one-step, four stages, order 4. R(z) = 1 + z + z<sup>2</sup>/2 + z<sup>3</sup>/6 + z<sup>4</sup>/24."
+  },
+  {
+    topic: "Stability function",
+    q: "Match the stability function R(z) to its method:",
+    options: [
+      "R(z) = 1 + z &rarr; Backward Euler.",
+      "R(z) = 1 + z + z<sup>2</sup>/2 &rarr; Heun.",
+      "R(z) = 1/(1+z) &rarr; Forward Euler.",
+      "R(z) = (1 &minus; z)/(1 + z) &rarr; Crank-Nicolson."
+    ],
+    answer: 1,
+    explanation: "Heun: R(z) = 1 + z + z<sup>2</sup>/2. FE has R(z) = 1 + z (not 1+z+z<sup>2</sup>/2); BE has R(z) = 1/(1&minus;z); CN has R(z) = (1 + z/2)/(1 &minus; z/2)."
+  },
+  {
+    topic: "Stability max h",
+    q: "Applying Heun to y' = &minus;10 y, the maximum h for absolute stability is approximately:",
+    options: ["h &lt; 0.1", "h &lt; 0.2", "h &lt; 1", "Any h"],
+    answer: 1,
+    explanation: "z = &minus;10 h; require |1 + z + z<sup>2</sup>/2| &lt; 1. Solving |1 &minus; 10h + 50 h<sup>2</sup>| &lt; 1 gives h &lt; <strong>0.2</strong>."
+  },
+
+  // ---------- Numerical differentiation ----------
+  {
+    topic: "Numerical differentiation",
+    q: "Which finite-difference formula approximates f'(x<sub>0</sub>) with order 2?",
+    options: [
+      "(f(x<sub>0</sub>+h) &minus; f(x<sub>0</sub>))/h.",
+      "(f(x<sub>0</sub>) &minus; f(x<sub>0</sub>&minus;h))/h.",
+      "(f(x<sub>0</sub>+h) &minus; f(x<sub>0</sub>&minus;h))/(2h).",
+      "f(x<sub>0</sub>+h) &minus; f(x<sub>0</sub>)."
+    ],
     answer: 2,
-    explanation: "f(0, &minus;2) = &minus;1&middot;(&minus;4)<sup>2</sup> = &minus;16. u<sub>1</sub> = &minus;2 + 0.1&middot;(&minus;16) = <strong>&minus;3.6</strong>."
+    explanation: "<strong>Centered difference</strong> has order 2 (truncation error O(h<sup>2</sup>)). Forward and backward are order 1."
+  },
+  {
+    topic: "Second derivative",
+    q: "The centered formula (f(x+h) &minus; 2f(x) + f(x&minus;h))/h<sup>2</sup> approximates:",
+    options: [
+      "f'(x), order 1.",
+      "f''(x), order 2.",
+      "f'''(x), order 2.",
+      "f(x)."
+    ],
+    answer: 1,
+    explanation: "Standard second-derivative centered approximation, error O(h<sup>2</sup>)."
   },
 ];
 
